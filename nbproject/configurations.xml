@@ -16,6 +16,7 @@
       <itemPath>UART.S</itemPath>
       <itemPath>config.S</itemPath>
       <itemPath>LCD.S</itemPath>
+      <itemPath>keypad.s</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
