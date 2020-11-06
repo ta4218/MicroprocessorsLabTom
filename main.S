@@ -3,6 +3,7 @@
 extrn	UART_Setup, UART_Transmit_Message  ; external uart subroutines
 extrn	LCD_Setup, LCD_Write_Message, LCD_Write_Hex ; external LCD subroutines
 extrn	ADC_Setup, ADC_Read		   ; external ADC subroutines
+extrn	h2d_setup
 	
 psect	udata_acs   ; reserve data space in access ram
 counter:    ds 1    ; reserve one byte for a counter variable
@@ -29,6 +30,7 @@ setup:	bcf	CFGS	; point to Flash program memory
 	call	UART_Setup	; setup UART
 	call	LCD_Setup	; setup UART
 	call	ADC_Setup	; setup ADC
+	call	h2d_setup	;setup h2d
 	goto	start
 	
 	; ******* Main programme ****************************************
