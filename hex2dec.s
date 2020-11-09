@@ -1,6 +1,6 @@
 #include <xc.inc>
 
-global	h2d_setup, multiply_16_setup, multiply_24_setup, h2d
+global	multiply, multiply_16, multiply_24, h2d, ascii
 psect	udata_acs
 sixteen:	ds  2
 sixteen_low:	ds  1
@@ -24,24 +24,15 @@ twofour_middle:	ds  1
 twofour_high:	ds  1
 k_low:		ds  1
 k_high:		ds  1
-decc:		ds  2
+deci:		ds  2
 hex_low:	ds  2
 hex_high:	ds  2
 h2d_count:	ds  1
+ascii_count:	ds  1    
+  
 
 psect	h2d_code, class=CODE
     
-h2d_setup:
-    clrf    TRISG, A
-    clrf    TRISJ, A
-    clrf    TRISH, A
-    clrf    TRISF, A
-    movlw   0x61
-    movwf   sixteen_high, A
-    movlw   0x51
-    movwf   sixteen_low, A
-    movlw   0x18	
-    movwf   eight, A	;8-bit value
 
 multiply:
  
@@ -64,16 +55,6 @@ add:
     movff   product_hhb, sum_high
     movff   product_llb, sum_low
     return
-    
-multiply_16_setup:
-    movlw   0x04
-    movwf   sixteen_high, A
-    movlw   0xD2
-    movwf   sixteen_low, A
-    movlw   0x41
-    movwf   sixteen_high_two, A
-    movlw   0x8A
-    movwf   sixteen_low_two, A
  
 multiply_16:
     movff   sixteen_high_two, eight, A
@@ -95,16 +76,6 @@ multiply_16:
     addwfc  threetwo_high, 1, 0
     
     return
-    
-multiply_24_setup:
-    movlw   0x18
-    movwf   eight, A
-    movlw   0x69
-    movwf   twofour_low, A
-    movlw   0x29
-    movwf   twofour_middle, A
-    movlw   0x3A
-    movwf   twofour_high, A
     
 multiply_24:
     movf    eight, 0, 0
@@ -138,15 +109,15 @@ h2d:
     movff   k_low, sixteen_low_two
     movff   k_high, sixteen_high_two
     
-    movlw   0x04
+    movlw   0x09
     movwf   hex_high, A
-    movlw   0xD2
+    movlw   0x98
     movwf   hex_low, A
     
     movff   hex_low, sixteen_low
     movff   hex_high, sixteen_high
     call    multiply_16
-    lfsr    1, decc
+    lfsr    1, deci
     movff   threetwo_high, POSTINC1
     movlw   3
     movwf   h2d_count, A
@@ -156,16 +127,25 @@ h2d_loop:
     movwf   eight, A
     movff   threetwo_low, twofour_low
     movff   threetwo_middlelow, twofour_middle
-    movff   threetwo_middlelow, twofour_high
+    movff   threetwo_middlehigh, twofour_high
     call    multiply_24
     movff   threetwo_high, POSTINC1
     decfsz  h2d_count
     bra	    h2d_loop
     return
     
-    
-    
-    
-    
+ascii:
+    movlw   0x4
+    movwf   ascii_count, A
+    lfsr    1, deci
+    movlw   0x30
+ascii_loop:    addwf   POSTINC1
+    decfsz  ascii_count
+    bra	    ascii_loop
+    lfsr    1, deci
     return
+
     
+    
+    
+   
