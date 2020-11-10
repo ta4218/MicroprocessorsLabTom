@@ -1,7 +1,7 @@
 #include <xc.inc>
 
 extrn	UART_Setup, UART_Transmit_Message  ; external subroutines
-extrn	LCD_Setup, LCD_Write_Message
+extrn	LCD_Setup, LCD_Write_Message, LCD_delay_ms
 extrn	keypad_setup, get_key, counter_kp
 	
 psect	udata_acs   ; reserve data space in access ram
@@ -14,7 +14,7 @@ myArray:    ds 0x80 ; reserve 128 bytes for message data
 psect	data    
 	; ******* myTable, data in programme memory, and its length *****
 myTable:
-	db	'1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','0', 0x0a
+	db	'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F', 0x0a
 					; message, plus carriage return
 	myTable_l   EQU	1	; length of data
 	align	2
@@ -35,26 +35,30 @@ setup:	bcf	CFGS	; point to Flash program memory
 start: 	
 	call	get_key
 	
-	lfsr	0, myArray	; Load FSR0 with address in RAM	
-	movlw	low highword(myTable)	; address of data in PM
-	movwf	TBLPTRU, A		; load upper bits to TBLPTRU
-	movlw	high(myTable)	; address of data in PM
-	movwf	TBLPTRH, A		; load high byte to TBLPTRH
-	movlw	low(myTable)	; address of data in PM
-	movwf	TBLPTRL, A		; load low byte to TBLPTRL
-loop: 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
-	movff	TABLAT, INDF0; move data from TABLAT to (FSR0), inc FSR0	
-	decfsz	counter_kp, A		; count down to zero
-	bra	loop		; keep going until finished
+	;lfsr	0, myArray	; Load FSR0 with address in RAM	
+	;movlw	low highword(myTable)	; address of data in PM
+	;movwf	TBLPTRU, A		; load upper bits to TBLPTRU
+	;movlw	high(myTable)	; address of data in PM
+	;movwf	TBLPTRH, A		; load high byte to TBLPTRH
+	;movlw	low(myTable)	; address of data in PM
+	;movwf	TBLPTRL, A		; load low byte to TBLPTRL
+ 	;tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
+	;movff	TABLAT, INDF0; move data from TABLAT to (FSR0), inc FSR0	
+	;decfsz	counter_kp, A		; count down to zero
+	;bra	loop		; keep going until finished
 		
 	movlw	myTable_l	; output message to UART
-	lfsr	2, myArray
+	;lfsr	2, myArray
 	call	UART_Transmit_Message
 	
-	movlw	myTable_l	; output message to LCD
-	;addlw	0xff		; don't send the final carriage return to LCD
-	lfsr	2, myArray
+	movlw	1	; output message to LCD
+	;addlw	0xff		; don't send the final carriage return to LCD	
+	;lfsr	2, myArray
 	call	LCD_Write_Message
+	
+
+	goto	start
+	
 	
 
 	goto	$		; goto current line in code
