@@ -39,12 +39,12 @@ read_rows:
 	movlw   0x0f
 	movwf   TRISE, A    ;Pins 0-3 input, Pins 4-7 output
     
-	;movlw   0x10
-	;movwf   kp_delay_count, A
-	;call    delay
+	movlw   0x10
+	movwf   kp_delay_count, A
+	call    delay
 	
-	movlw   0x14
-	call    LCD_delay_ms
+	;movlw   0x1
+	;call    LCD_delay_ms
     
 	movff   PORTE,  row_input
  
@@ -53,12 +53,12 @@ read_cols:
 	movlw   0xf0
 	movwf   TRISE, A    ;Pins 0-3 output, Pins 4-7 input
     
-	;movlw   0x10
-	;movwf   kp_delay_count, A
-	;call    delay
+	movlw   0x1
+	movwf   kp_delay_count, A
+	call    delay
     
-	movlw   0x14
-	call    LCD_delay_ms
+	;movlw   0x1
+	;call    LCD_delay_ms
    
 	movff   PORTE, col_input
     
@@ -88,13 +88,12 @@ loop_kp:
 	;movff   counter_kp, 	;move 'counter' value of keypad to 0x24
 	movlw	0x1
 	subwf	counter_kp
-	return
 
 ascii:
 	movlw	0x30
-	
 	lfsr    2, counter_kp
 	addwf	INDF2
+	return
 delay:        
 	decfsz  kp_delay_count, f, A
 	movlw   0x10
