@@ -1,10 +1,11 @@
 #include <xc.inc>
 
 global  keypad_setup, get_key, counter_kp
+extrn	LCD_delay_ms
      
 psect	data	; a table of values in program memory
 table:
-	db      0xFF, 0xBE, 0x77, 0xB7, 0xD7, 0x7B, 0xBB, 0xDB, 0x7D, 0xBD, 0xDD, 0x7E, 0xDE, 0xEE
+	db      0xBE, 0x77, 0xB7, 0xD7, 0x7B, 0xBB, 0xDB, 0x7D, 0xBD, 0xDD, 0x7E, 0xDE, 0xEE
 	db      0xED, 0xEB, 0xE7    ; table of combined values for rows/columns, will compare returned value to this table
 	align   2
 	
@@ -38,12 +39,12 @@ read_rows:
 	movlw   0x0f
 	movwf   TRISE, A    ;Pins 0-3 input, Pins 4-7 output
     
-	movlw   0x10
-	movwf   kp_delay_count, A
-	call    delay
+	;movlw   0x10
+	;movwf   kp_delay_count, A
+	;call    delay
 	
-    ;movlw   1000
-    ;call    LCD_delay_ms
+	movlw   0x14
+	call    LCD_delay_ms
     
 	movff   PORTE,  row_input
  
@@ -52,12 +53,12 @@ read_cols:
 	movlw   0xf0
 	movwf   TRISE, A    ;Pins 0-3 output, Pins 4-7 input
     
-	movlw   0x10
-	movwf   kp_delay_count, A
-	call    delay
+	;movlw   0x10
+	;movwf   kp_delay_count, A
+	;call    delay
     
-    ;movlw   1000
-    ;call    LCD_delay_ms
+	movlw   0x14
+	call    LCD_delay_ms
    
 	movff   PORTE, col_input
     
@@ -85,11 +86,15 @@ loop_kp:
 	cpfseq  combined_input, A	;compare pressed value with table
 	bra     loop_kp        ; keep going until finished
 	;movff   counter_kp, 	;move 'counter' value of keypad to 0x24
-	movlw	0x2
+	movlw	0x1
 	subwf	counter_kp
-	movff	counter_kp, PORTH, A
 	return
 
+ascii:
+	movlw	0x30
+	
+	lfsr    2, counter_kp
+	addwf	INDF2
 delay:        
 	decfsz  kp_delay_count, f, A
 	movlw   0x10
