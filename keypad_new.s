@@ -39,7 +39,7 @@ read_rows:
 	movlw   0x0f
 	movwf   TRISE, A    ;Pins 0-3 input, Pins 4-7 output
     
-	movlw   0x10
+	movlw   0x2
 	movwf   kp_delay_count, A
 	call    delay
 	
@@ -53,7 +53,7 @@ read_cols:
 	movlw   0xf0
 	movwf   TRISE, A    ;Pins 0-3 output, Pins 4-7 input
     
-	movlw   0x1
+	movlw   0x2
 	movwf   kp_delay_count, A
 	call    delay
     
@@ -92,18 +92,18 @@ loop_kp:
 ascii:
 	movlw	0x30
 	lfsr    2, counter_kp
-	addwf	INDF2
+	addwf	INDF2, 1, 0
 	return
 delay:        
 	decfsz  kp_delay_count, f, A
 	movlw   0x10
 	movwf   0x32, A
 	call    cascade
-	tstfsz  0x30, A
+	tstfsz  kp_delay_count, A
 	bra	delay
 	return
     
-cascade:
+cascade:  ;190ns delay
 	decfsz  0x32, f, A
 	bra	cascade
 	return
