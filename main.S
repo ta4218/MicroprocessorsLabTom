@@ -26,7 +26,7 @@ rst: 	org 0x0
 	; ******* Programme FLASH read Setup Code ***********************
 setup:	bcf	CFGS	; point to Flash program memory  
 	bsf	EEPGD 	; access Flash program memory
-	call	UART_Setup	; setup UART
+	;call	UART_Setup	; setup UART
 	call	LCD_Setup	; setup UART
 	call	keypad_setup
 	goto	start
@@ -47,16 +47,16 @@ start:
 	;decfsz	counter_kp, A		; count down to zero
 	;bra	loop		; keep going until finished
 		
-	movlw	myTable_l	; output message to UART
+	;movlw	myTable_l	; output message to UART
 	;lfsr	2, myArray
-	call	UART_Transmit_Message
+	;call	UART_Transmit_Message
 	
 	movlw	1	; output message to LCD
 	;addlw	0xff		; don't send the final carriage return to LCD	
 	;lfsr	2, myArray
 	call	LCD_Write_Message
 	
-
+	
 	goto	start
 	
 	
