@@ -4,21 +4,22 @@ extrn	UART_Setup, UART_Transmit_Message  ; external subroutines
 extrn	LCD_Setup, LCD_Write_Message, LCD_delay_ms
 extrn	keypad_setup, get_key, counter_kp
 extrn	DAC_Setup, DAC_Int_Hi
+extrn	menu_setup
     
 psect	udata_acs   ; reserve data space in access ram
 counter:    ds 1    ; reserve one byte for a counter variable
 delay_count:ds 1    ; reserve one byte for counter in the delay routine
     
-psect	udata_bank4 ; reserve data anywhere in RAM (here at 0x400)
-myArray:    ds 0x80 ; reserve 128 bytes for message data
+;psect	udata_bank4 ; reserve data anywhere in RAM (here at 0x400)
+;myArray:    ds 0x80 ; reserve 128 bytes for message data
 
-psect	data    
+;;psect	data    
 	; ******* myTable, data in programme memory, and its length *****
-myTable:
-	db	'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F', 0x0a
+;myTable:
+	;db	'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F', 0x0a
 					; message, plus carriage return
-	myTable_l   EQU	1	; length of data
-	align	2
+	;myTable_l   EQU	1	; length of data
+	;align	2
     
 psect	code, abs	
 rst: 	org 0x0
@@ -29,13 +30,14 @@ setup:	bcf	CFGS	; point to Flash program memory
 	bsf	EEPGD 	; access Flash program memory
 	;call	UART_Setup	; setup UART
 	call	LCD_Setup	; setup UART
-	call	main_menu	;setup  MAIN MENU
-	call	keypad_setup	;setup keypad
-	goto	start
+	call	menu_setup	;setup  MAIN MENU
+	goto	$
+	;call	keypad_setup	;setup keypad	
+	;goto	start
 	
 	; ******* Main programme ****************************************
 start: 	
-	call	get_key
+	;call	get_key
 	
 	;lfsr	0, myArray	; Load FSR0 with address in RAM	
 	;movlw	low highword(myTable)	; address of data in PM
@@ -70,8 +72,8 @@ delay:	decfsz	delay_count, A	; decrement until zero
 	bra	delay
 	return
 
-rst:	org	0x0000	; reset vector
-	goto	start_interrupt
+
+
 
 int_hi:	org	0x0008	; high vector, no low vector
 	goto	DAC_Int_Hi
@@ -81,3 +83,4 @@ start_interrupt:	call	DAC_Setup
 	
 	
 	end	rst
+	
