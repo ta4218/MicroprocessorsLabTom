@@ -3,7 +3,8 @@
 extrn	UART_Setup, UART_Transmit_Message  ; external subroutines
 extrn	LCD_Setup, LCD_Write_Message, LCD_delay_ms
 extrn	keypad_setup, get_key, counter_kp
-	
+extrn	DAC_Setup, DAC_Int_Hi
+    
 psect	udata_acs   ; reserve data space in access ram
 counter:    ds 1    ; reserve one byte for a counter variable
 delay_count:ds 1    ; reserve one byte for counter in the delay routine
@@ -28,7 +29,8 @@ setup:	bcf	CFGS	; point to Flash program memory
 	bsf	EEPGD 	; access Flash program memory
 	;call	UART_Setup	; setup UART
 	call	LCD_Setup	; setup UART
-	call	keypad_setup
+	call	main_menu	;setup  MAIN MENU
+	call	keypad_setup	;setup keypad
 	goto	start
 	
 	; ******* Main programme ****************************************
@@ -68,18 +70,14 @@ delay:	decfsz	delay_count, A	; decrement until zero
 	bra	delay
 	return
 
-	end	rst
-	
-extrn	DAC_Setup, DAC_Int_Hi
-
-psect	code, abs
 rst:	org	0x0000	; reset vector
-	goto	start
+	goto	start_interrupt
 
 int_hi:	org	0x0008	; high vector, no low vector
 	goto	DAC_Int_Hi
 	
-start:	call	DAC_Setup
+start_interrupt:	call	DAC_Setup
 	goto	$	; Sit in infinite loop
-
+	
+	
 	end	rst
