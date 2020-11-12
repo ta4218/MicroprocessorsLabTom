@@ -7,8 +7,12 @@ psect	dac_code, class=CODE
 DAC_Int_Hi:	
 	btfss	TMR0IF		; check that this is timer0 interrupt
 	retfie	f		; if not then return
-	incf	LATJ, F, A	; increment PORTD
+	call	read_rows
+	call	read_col
+	movlw	0xff
+	cpfseq	combined_input
 	bcf	TMR0IF		; clear interrupt flag
+	bsf	T0CON, 7
 	retfie	f		; fast return from interrupt
 
 DAC_Setup:

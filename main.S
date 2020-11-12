@@ -73,12 +73,11 @@ delay:	decfsz	delay_count, A	; decrement until zero
 	return
 
 
-
-
 int_hi:	org	0x0008	; high vector, no low vector
 	goto	DAC_Int_Hi
 	
-start_interrupt:	call	DAC_Setup
+start_interrupt:	
+	call	DAC_Setup
 	goto	$	; Sit in infinite loop
 	
 	

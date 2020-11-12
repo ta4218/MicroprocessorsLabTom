@@ -1,4 +1,4 @@
-#include <xc.inc>
+call#include <xc.inc>
     
 global  UART_Setup, UART_Transmit_Message
 
@@ -33,4 +33,4 @@ UART_Transmit_Byte:	    ; Transmits byte stored in W
     movwf   TXREG1, A
     return
 
-
+end
