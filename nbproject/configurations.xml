@@ -16,6 +16,7 @@
       <itemPath>config.S</itemPath>
       <itemPath>LCD.S</itemPath>
       <itemPath>DAC_Interrupt.s</itemPath>
+      <itemPath>keypad_project.s</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

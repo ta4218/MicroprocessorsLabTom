@@ -1,7 +1,7 @@
 #include <xc.inc>
 
 extrn	LCD_Setup, LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off, display_clear
-extrn	start_keypad, keypad_setup, DAC_Setup, DAC_Int_Hi, get_key
+extrn	start_keypad, keypad_setup, DAC_Setup, DAC_Int_Hi, get_key, twofivefive, combined_input
 	
 psect	udata_acs   ; reserve data space in access ram
 counter:    ds 1    ; reserve one byte for a counter variable
@@ -24,16 +24,17 @@ myTable:
 	align	2
 	
 psect	code, abs	
-rst: 	org 0x0
- 	goto	setup
+
 
 	; ******* Programme FLASH read Setup Code ***********************
 setup:	bcf	CFGS	; point to Flash program memory  
 	bsf	EEPGD 	; access Flash program memory
 	call	LCD_Setup	; setup UART
 	call	keypad_setup
-	goto	start
+	;goto	start
 	
+rst: 	org 0x0
+	goto	start_interrupt
 	; ******* Main Menu Construction ****************************************
 start: 	lfsr	0, myArray	; Load FSR0 with address in RAM
 	movlw	low highword(myTable)	; address of data in PM
@@ -45,20 +46,26 @@ start: 	lfsr	0, myArray	; Load FSR0 with address in RAM
 	movlw	myTable_l	; bytes to read
 	movwf 	counter, A		; our counter register
 	
-loop: 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
-	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
-	decfsz	counter, A		; count down to zero
-	bra	loop		; keep going until finished
-		
-	movlw	0x11	; output message to LCD
-	addlw	0xff		; don't send the final carriage return to LCD
-	lfsr	2, myArray
-	call	LCD_Write_Message
-	call	second_line
-	movlw	0x11
+loop: 	;tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
+	;movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
+	;decfsz	counter, A		; count down to zero
+	;bra	loop		; keep going until finished
+	call	display_clear
+	movlw	0x2
 	addlw	0xff
+	call	LCD_Write_Message	
+	;movlw	0x11	; output message to LCD
+	;addlw	0xff		; don't send the final carriage return to LCD
+	movlw	0x1
+	;lfsr	2, myArray
 	call	LCD_Write_Message
-	call	cursor_off
+	goto	$
+	;bra	loop
+	;call	second_line
+	;movlw	0x11
+	;addlw	0xff
+	;call	LCD_Write_Message
+	;call	cursor_off
 	
 	;need interrupt here
 
@@ -84,7 +91,7 @@ game_select:
 	addlw	0xff
 	call	LCD_Write_Message
 	
-	;need interrupt
+	;need 5 second delay
 	
 	call	second_line
 	movlw	0x11
@@ -94,18 +101,16 @@ game_select:
 	
 	goto	start_interrupt
 	
-int_hi:	org	0x0008	; high vector, no low vector
 
+int_hi:	org	0x0008	; high vector, no low vector
 	goto	DAC_Int_Hi
 
 start_interrupt:	
 	call	DAC_Setup
-
-	goto	$	; Sit in infinite loop
-
-	call	start_keypad
-	
-	
-	goto	$		; goto current line in code
-
+	movlw	0xff
+	cpfslt	combined_input
+	goto	$
+	goto	loop
+	;goto	$	; Sit in infinite loop
+	;goto	setup
 	end	rst

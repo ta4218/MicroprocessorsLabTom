@@ -1,7 +1,6 @@
 #include <xc.inc>
 
-global  keypad_setup, get_key, counter_kp, start_keypad, get_key
-extrn	LCD_delay_ms
+global  keypad_setup, get_key, counter_kp, start_keypad, get_key, combined_input
      
 psect	data	; a table of values in program memory
 keypad_table:
@@ -61,6 +60,7 @@ decode:
 	movf    row_input, W, A
 	addwf   col_input, W, A	    ;Combine value of rows/columns
 	movwf   combined_input, A		    ;Move to RAM
+	movf	combined_input, W, A
 	return
 	
 start_keypad:
