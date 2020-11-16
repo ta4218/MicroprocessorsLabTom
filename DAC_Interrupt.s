@@ -10,12 +10,8 @@ psect	dac_code, class=CODE
 DAC_Int_Hi:	
 	btfss	TMR0IF		; check that this is timer0 interrupt
 	retfie	f		; if not then return
-	
 	call	get_key
 	incf	LATJ, A
-	;movlw	0xff
-	;cpfseq	combined_input
-	
 	bcf	TMR0IF		; clear interrupt flag
 	retfie	f		; fast return from interrupt
 
