@@ -1,7 +1,7 @@
 #include <xc.inc>
 
-global  keypad_setup, get_key, counter_kp, start_keypad, get_key
-extrn	LCD_delay_ms
+global  keypad_setup, get_key, counter_kp, start_keypad, get_key, combined_input
+
      
 psect	data	; a table of values in program memory
 keypad_table:
@@ -11,6 +11,7 @@ keypad_table:
 	
 psect	udata_acs   ; define all your local variables here (look at LCD.S), they will be put in access ram
 kp_delay_count: ds 1 ; one byte for counter variable in access ram 
+kp_delay_count2: ds 1
 counter_kp: ds 1    ; one byte for counter variable in access ram
 row_input:  ds 1
 col_input:  ds 1
@@ -31,6 +32,7 @@ keypad_setup:
 	bsf     REPU
 	movlb   0x00 
 	clrf	TRISH, A	;porth output to display keypad value
+	clrf	TRISD, A
 	return
 
 get_key:
@@ -45,6 +47,7 @@ read_rows:
 	call    delay
     
 	movff   PORTE,  row_input
+
  
 read_cols:
 	clrf    LATE, A    ;Write 0s to LATE
@@ -84,23 +87,24 @@ loop_kp:
 	;movff   counter_kp, 	;move 'counter' value of keypad to 0x24
 	movlw	0x1
 	subwf	counter_kp
-
 ascii:
 	movlw	0x30
 	lfsr    2, counter_kp
 	addwf	INDF2, 1, 0
 	return
+
+
 delay:        
 	decfsz  kp_delay_count, f, A
 	movlw   0x10
-	movwf   0x32, A
+	movwf	kp_delay_count2, A
 	call    cascade
 	tstfsz  kp_delay_count, A
 	bra	delay
 	return
     
 cascade:  ;190ns delay
-	decfsz  0x32, f, A
+	decfsz  kp_delay_count2, f, A
 	bra	cascade
 	return
 	

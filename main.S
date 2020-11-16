@@ -1,7 +1,7 @@
 #include <xc.inc>
 
 extrn	LCD_Setup, LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off, display_clear
-extrn	start_keypad, keypad_setup, DAC_Setup, DAC_Int_Hi, get_key
+extrn	start_keypad, keypad_setup, DAC_Setup, DAC_Int_Hi, get_key, combined_input
 	
 psect	udata_acs   ; reserve data space in access ram
 counter:    ds 1    ; reserve one byte for a counter variable
@@ -24,14 +24,19 @@ myTable:
 	align	2
 	
 psect	code, abs	
-rst: 	org 0x0
+rst: 	org	0x0
  	goto	setup
+
+int_hi:	org	0x0008	; high vector, no low vector
+
+	goto	DAC_Int_Hi	
 
 	; ******* Programme FLASH read Setup Code ***********************
 setup:	bcf	CFGS	; point to Flash program memory  
 	bsf	EEPGD 	; access Flash program memory
 	call	LCD_Setup	; setup UART
 	call	keypad_setup
+	call	DAC_Setup
 	goto	start
 	
 	; ******* Main Menu Construction ****************************************
@@ -91,21 +96,14 @@ game_select:
 	addlw	0xff
 	call	LCD_Write_Message
 	call	cursor_off
-	
-	goto	start_interrupt
-	
-int_hi:	org	0x0008	; high vector, no low vector
 
-	goto	DAC_Int_Hi
-
-start_interrupt:	
-	call	DAC_Setup
-
-	goto	$	; Sit in infinite loop
-
-	call	start_keypad
-	
-	
-	goto	$		; goto current line in code
-
-	end	rst
+test:	call	start_keypad
+	movff	combined_input, LATD
+	movlw	0xff
+	cpfslt	combined_input, A	
+	bra	test
+	call	display_clear
+	movlw	0x1
+	call	LCD_Write_Message
+	goto	test
+			
