@@ -60,7 +60,6 @@ decode:
 	movf    row_input, W, A
 	addwf   col_input, W, A	    ;Combine value of rows/columns
 	movwf   combined_input, A		    ;Move to RAM
-	movf	combined_input, W, A
 	return
 	
 start_keypad:
