@@ -1,16 +1,15 @@
     #include <pic18_chip_select.inc>
     #include <xc.inc>
-    
+extrn   h2d
+global	setupRNG
 psect    udata_bank4
 RANDOM:     ds  1        ;reserve 1 byte for RANDOM variable
 counterRNG:    ds  1
-psect    code, abs    
     
-mainRNG:
-    org    0x0
-    goto    setupRNG
-    org    0x100
     
+psect    RNG_code, class=CODE    
+    
+
 setupRNG:    
     bcf    CFGS
     bsf    EEPGD
@@ -31,7 +30,10 @@ loopRNG:
     call   shiftRNG
     call   outputRNG
     movf   RANDOM, W
+    tstfsz  counterRNG
     bra    loopRNG
+    lfsr    0, myArrayRNG    ;load FSR0 with adress in RAM
+    return
     
 shiftRNG:
     RLCF    RANDOM, W        ; rotates MSB to LSB of Random and other bits shift left, stored in W
@@ -57,7 +59,5 @@ saveRNG:
     movwf   POSTINC0, A        ;    load LFSR0 with W and increment LFSR
     decfsz  counterRNG, A        ;    decrement counter to count down from 10
     return
-    
-    end main
 
 
