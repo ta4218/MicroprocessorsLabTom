@@ -3,6 +3,9 @@
 extrn	LCD_Setup
 extrn	keypad_setup,  start_logo, game_select, key_control, counter_kp
 extrn	DAC_Setup, DAC_Int_Hi
+extrn	setupRNG, Multiplygame_1
+extrn   h2d
+    
 psect	code, abs	
 rst: 	org	0x0
  	goto	setup
@@ -17,6 +20,8 @@ setup:	bcf	CFGS	; point to Flash program memory
 	call	LCD_Setup	; setup UART
 	call	keypad_setup
 	call	DAC_Setup
+	call	setupRNG
+	call	h2d
 	goto	start
 
 start:
@@ -40,10 +45,9 @@ test2:
 	goto	game_1
 	
 game_1:
-	movff	counter_kp, LATD, A
-	goto	$
+	call	Multiplygame_1
 
 game_2:	
 	movff	counter_kp, LATD, A
-	goto	$
+;	goto	$
 			

@@ -20,6 +20,7 @@
       <itemPath>main_menu_PYB.s</itemPath>
       <itemPath>Game_multiply.s</itemPath>
       <itemPath>Random_Number_Generator.s</itemPath>
+      <itemPath>Hex2Dec.s</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
