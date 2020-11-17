@@ -1,7 +1,7 @@
 #include <xc.inc>
 	
 global	DAC_Setup, DAC_Int_Hi
-extrn	get_key, combined_input, start_keypad
+extrn	get_key, combined_input
 
    
     

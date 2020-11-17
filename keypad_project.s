@@ -1,6 +1,7 @@
 #include <xc.inc>
 
-global  keypad_setup, get_key, counter_kp, start_keypad, get_key, combined_input
+global  keypad_setup, key_control, counter_kp, get_key, combined_input
+extrn	display_clear, LCD_Write_Message
 
      
 psect	data	; a table of values in program memory
@@ -33,6 +34,7 @@ keypad_setup:
 	movlb   0x00 
 	clrf	TRISH, A	;porth output to display keypad value
 	clrf	TRISD, A
+	clrf	LATD, A
 	return
 
 get_key:
@@ -91,6 +93,17 @@ ascii:
 	movlw	0x30
 	lfsr    2, counter_kp
 	addwf	INDF2, 1, 0
+	return
+
+key_control:	
+	;movff	combined_input, LATD test
+	movlw	0xff
+	cpfslt	combined_input, A	
+	goto	key_control
+	call	start_keypad
+	call	display_clear
+	movlw	0x1
+	call	LCD_Write_Message
 	return
 
 
