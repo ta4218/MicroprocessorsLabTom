@@ -1,6 +1,6 @@
 #include <xc.inc>
 
-global	multiply, multiply_16, multiply_24, h2d, ascii, deci
+global	multiply, multiply_16, multiply_24, h2d, ascii, deci2
 psect	udata_acs
 sixteen:	ds  2
 sixteen_low:	ds  1
@@ -25,6 +25,7 @@ twofour_high:	ds  1
 k_low:		ds  1
 k_high:		ds  1
 deci:		ds  2
+deci2:		ds  2
 hex_low:	ds  2
 hex_high:	ds  2
 h2d_count:	ds  1
@@ -114,6 +115,7 @@ h2d:
     ;movlw   0x98
     movff   INDF0, hex_low
     
+    
     movff   hex_low, sixteen_low
     movff   hex_high, sixteen_high
     call    multiply_16
@@ -133,16 +135,25 @@ h2d_loop:
     decfsz  h2d_count
     bra	    h2d_loop
     
+    
 ascii:
-    movlw   0x4
-    movwf   ascii_count, A
-    lfsr    1, deci
-    movlw   0x30
+	movlw   0x5
+	movwf   ascii_count, A
+	lfsr    1, deci
+	lfsr    2, deci2
+	
+tst0:   decfsz  ascii_count, A
+	tstfsz  INDF1
+	goto    ascii_loop
+	movlw	0
+	addwf	POSTINC1
+	bra	tst0    
 ascii_loop:    
-    addwf   POSTINC1
+    movlw   0x30
+    addwf   POSTINC1, 0, 0
+    movwf   POSTINC2, 0   
     decfsz  ascii_count
     bra	    ascii_loop
-    lfsr    1, deci
     return
 
 

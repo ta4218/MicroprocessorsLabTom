@@ -1,12 +1,13 @@
 #include <xc.inc>
     
-extrn	LCD_Write_Message, cursor_off, deci
+extrn	LCD_Write_Message, cursor_off, deci2
     
 global	Multiplygame_1
 
 psect	udata_acs   ; reserve data space in access ram
 counterMG:    ds 1    ; reserve one byte for a counter variable
 delay_count:ds 1    ; reserve one byte for counter in the delay routine
+table_counter: ds 1
     
 psect	udata_bank4 ; reserve data anywhere in RAM (here at 0x400)
 myArrayMG:    ds 0x30 ; reserve 128 bytes for message data
@@ -41,14 +42,19 @@ loop_game1:
 	movff	TABLAT, POSTINC0; move data from TABLAT to (FSR0), inc FSR0	
 	decfsz	counterMG, A		; count down to zero
 	bra	loop_game1		; keep going until finished
-		
+	
+	lfsr	0, myArrayMG
 	movlw	0x3	; output message to LCD
 	lfsr	2, myArrayMG
 	call	LCD_Write_Message
-	lfsr    2, deci    ;load FSR0 with adress in RAM
-	movlw	0x4
+	lfsr    2, deci2    ;load FSR0 with adress in RAM
+	movlw	0x2
 	call	LCD_Write_Message
-	call	cursor_off
-	
+	lfsr	2, myArrayMG
+	incf	INDF2
+	movlw	0x1
+	call	LCD_Write_Message
 	return
+	
+
 	

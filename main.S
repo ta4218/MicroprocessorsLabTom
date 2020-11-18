@@ -1,7 +1,7 @@
 #include <xc.inc>
 
 extrn	LCD_Setup
-extrn	keypad_setup,  start_logo, game_select, key_control, counter_kp
+extrn	keypad_setup,  start_logo, game_select, key_control, counter_kp, display_clear
 extrn	DAC_Setup, DAC_Int_Hi
 extrn	setupRNG, Multiplygame_1
 extrn   h2d
@@ -45,6 +45,7 @@ test2:
 	goto	game_1
 	
 game_1:
+	call	display_clear
 	call	Multiplygame_1
 
 game_2:	

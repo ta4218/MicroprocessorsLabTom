@@ -1,6 +1,6 @@
     #include <pic18_chip_select.inc>
     #include <xc.inc>
-extrn   h2d
+
 global	setupRNG
 psect    udata_bank4
 RANDOM:     ds  1        ;reserve 1 byte for RANDOM variable
