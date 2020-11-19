@@ -1,6 +1,6 @@
 #include <xc.inc>
 
-global  keypad_setup, key_control, counter_kp, get_key, combined_input
+global  keypad_setup, key_control,key_control_noclr, counter_kp, get_key, combined_input, counter_kp
 extrn	display_clear, LCD_Write_Message
 
      
@@ -39,6 +39,8 @@ keypad_setup:
 
 get_key:
 	goto	read_rows
+	movlw	0xff
+	movwf	combined_input, A
 read_rows:
 	clrf    LATE, A    ;Write 0s to LATE
 	movlw   0x0f
@@ -69,7 +71,7 @@ decode:
 	return
 	
 start_keypad:
-	lfsr	0, array_kp    ; Load FSR0 with address in RAM    
+	lfsr	2, array_kp    ; Load FSR0 with address in RAM    
 	movlw   low highword(keypad_table)    ; address of data in PM
 	movwf   TBLPTRU, A        ; load upper bits to TBLPTRU
 	movlw   high(keypad_table)    ; address of data in PM
@@ -96,12 +98,22 @@ ascii:
 	return
 
 key_control:	
-	;movff	combined_input, LATD test
+	movff	combined_input, LATD ;test
 	movlw	0xff
 	cpfslt	combined_input, A	
 	goto	key_control
 	call	start_keypad
 	call	display_clear
+	movlw	0x1
+	call	LCD_Write_Message
+	return
+
+key_control_noclr:	
+	movff	combined_input, LATD ;test
+	movlw	0xff
+	cpfslt	combined_input, A	
+	goto	key_control_noclr
+	call	start_keypad
 	movlw	0x1
 	call	LCD_Write_Message
 	return

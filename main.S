@@ -4,7 +4,7 @@ extrn	LCD_Setup
 extrn	keypad_setup,  start_logo, game_select, key_control, counter_kp, display_clear
 extrn	DAC_Setup, DAC_Int_Hi
 extrn	setupRNG, Multiplygame_1
-extrn   h2d
+extrn   h2d_setup
     
 psect	code, abs	
 rst: 	org	0x0
@@ -21,7 +21,7 @@ setup:	bcf	CFGS	; point to Flash program memory
 	call	keypad_setup
 	call	DAC_Setup
 	call	setupRNG
-	call	h2d
+	call	h2d_setup
 	goto	start
 
 start:

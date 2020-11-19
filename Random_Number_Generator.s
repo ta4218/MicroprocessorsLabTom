@@ -13,7 +13,7 @@ psect    RNG_code, class=CODE
 setupRNG:    
     bcf    CFGS
     bsf    EEPGD
-    movlw    0x21        ; set 0x21 as seed
+    movlw    0x35        ; set 0x21 as seed
     goto    startRNG
     
 myTableRNG:
@@ -51,6 +51,12 @@ outputRNG:
     bcf	    RANDOM, 7        ; Clear MSB to ensure no higher than 127
     movlw   0x63            
     cpfsgt  RANDOM            ; if greater than 99, skip call save
+    call    checkdouble
+    return
+    
+checkdouble:
+    movlw   0xA
+    cpfslt  RANDOM
     call    saveRNG
     return
     

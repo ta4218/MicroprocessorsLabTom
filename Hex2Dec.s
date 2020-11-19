@@ -1,6 +1,6 @@
 #include <xc.inc>
 
-global	multiply, multiply_16, multiply_24, h2d, ascii, deci2
+global	multiply, multiply_16, multiply_24, h2d_setup, ascii, random_numbers
 psect	udata_acs
 sixteen:	ds  2
 sixteen_low:	ds  1
@@ -29,7 +29,9 @@ deci2:		ds  2
 hex_low:	ds  2
 hex_high:	ds  2
 h2d_count:	ds  1
-ascii_count:	ds  1    
+ascii_count:	ds  1
+random_numbers:	ds  20
+rng_counter:	ds  1
   
 
 psect	h2d_code, class=CODE
@@ -101,6 +103,16 @@ multiply_24:
     addwfc  threetwo_high, 1, 0
     return
     
+h2d_setup:
+    movlw   0xA
+    movwf   rng_counter, A
+    lfsr    2, random_numbers
+rn_loop:
+    call    h2d
+    decfsz  rng_counter
+    bra	    rn_loop
+    return
+
 h2d:
     movlw   0x8A
     movwf   k_low, A
@@ -113,7 +125,7 @@ h2d:
     movlw   0x00
     movwf   hex_high, A
     ;movlw   0x98
-    movff   INDF0, hex_low
+    movff   POSTINC0, hex_low
     
     
     movff   hex_low, sixteen_low
@@ -140,7 +152,7 @@ ascii:
 	movlw   0x5
 	movwf   ascii_count, A
 	lfsr    1, deci
-	lfsr    2, deci2
+	;lfsr    2, deci2
 	
 tst0:   decfsz  ascii_count, A
 	tstfsz  INDF1
