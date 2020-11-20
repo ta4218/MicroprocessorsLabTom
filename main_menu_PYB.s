@@ -1,6 +1,6 @@
 #include <xc.inc>
     
-extrn	LCD_Setup, LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off, display_clear
+extrn	LCD_Setup, LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off, display_clear, delay_1s
 extrn	keypad_setup, DAC_Setup, DAC_Int_Hi, get_key, combined_input
 global	start_logo, game_select
 psect	udata_acs   ; reserve data space in access ram
@@ -62,7 +62,7 @@ game_select:
 	addlw	0xff
 	call	LCD_Write_Message
 	
-	;need interrupt
+	
 	
 	call	second_line
 	movlw	0x11
@@ -70,14 +70,13 @@ game_select:
 	call	LCD_Write_Message
 	call	cursor_off
 	
-	;need 10 SECOND DELAY
+	call	delay_1s
 	
 	call	display_clear
 	movlw	0x11
 	addlw	0xff
 	call	LCD_Write_Message
 	
-	;need interrupt
 	
 	call	second_line
 	movlw	0x11

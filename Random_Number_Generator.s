@@ -76,6 +76,7 @@ multiplyRNG2:
     movff   PLUSW2, vari2
     movf    vari2, W
     mulwf   vari
+    return
     
 
 

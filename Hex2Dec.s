@@ -106,7 +106,7 @@ multiply_24:
 h2d_setup:
     movlw   0xA
     movwf   rng_counter, A
-    lfsr    2, random_numbers
+    lfsr    2, random_numbers	    ;0x21
 rn_loop:
     call    h2d_8bit
     decfsz  rng_counter
@@ -125,18 +125,32 @@ h2d_8bit:
     movlw   0x00
     movwf   hex_high, A
     ;movlw   0x98
-    movff   POSTINC0, hex_low
+    movff   POSTINC0, hex_low  ;0x1b
     
     
     movff   hex_low, sixteen_low
     movff   hex_high, sixteen_high
     call    multiply_16
-    lfsr    1, deci
+    lfsr    1, deci  ;0x17
     movff   threetwo_high, POSTINC1
     movlw   3
     movwf   h2d_count, A
     goto    h2d_loop
-    
+ 
+h2d_loop:
+    movlw   0x0A
+    movwf   eight, A
+    movff   threetwo_low, twofour_low
+    movff   threetwo_middlelow, twofour_middle
+    movff   threetwo_middlehigh, twofour_high
+    call    multiply_24
+    movff   threetwo_high, POSTINC1
+    decfsz  h2d_count
+    bra	    h2d_loop
+    lfsr    1, deci
+    call    ascii
+    return
+       
 h2d_16bit:
     movlw   0x8A
     movwf   k_low, A
@@ -159,9 +173,9 @@ h2d_16bit:
     movff   threetwo_high, POSTINC1
     movlw   3
     movwf   h2d_count, A
-    goto    h2d_loop
+    goto    h2d_loop_noascii
     
-h2d_loop:
+h2d_loop_noascii:
     movlw   0x0A
     movwf   eight, A
     movff   threetwo_low, twofour_low
@@ -170,9 +184,9 @@ h2d_loop:
     call    multiply_24
     movff   threetwo_high, POSTINC1
     decfsz  h2d_count
-    bra	    h2d_loop
+    bra	    h2d_loop_noascii
     lfsr    1, deci
-    return
+  return
     
 ascii:
 	movlw   0x5

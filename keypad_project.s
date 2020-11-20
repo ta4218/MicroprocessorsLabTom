@@ -18,6 +18,8 @@ row_input:  ds 1
 col_input:  ds 1
 combined_input:	ds 1
 table_temp: ds 1
+    
+    
 	
     
 psect   udata_bank4	; more space in data memory in bank 4

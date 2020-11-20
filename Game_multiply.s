@@ -13,14 +13,18 @@ user_answer:   ds   4
 ia_count:	ds  1
 rng_count:	ds  1
 score:	    ds  1
+    
 psect	udata_bank4 ; reserve data anywhere in RAM (here at 0x400)
-myArrayMG:    ds 0x30 ; reserve 128 bytes for message data
+myArrayMG:    ds 0xA ; reserve 128 bytes for message data
 
+    
 psect	MG_code, class= CODE	
 	
 Multiplygame_1: 	
-	
-loop_game1: 	
+	movlw	0x0
+	movwf	delay_count, A
+	movwf	counterMG, A
+loop_game1: 
 	
 	lfsr	0, random_numbers
 	
@@ -55,8 +59,9 @@ xd:	call	delay_1s
 	movlw	0x3D
 	call	write_one
 	
+	lfsr	1, user_answer
 	call	input_answer	
-	incf	table_counter
+xd1:	incf	table_counter
 	movlw	0x6
 	cpfseq	table_counter
 	bra	xd
@@ -74,6 +79,7 @@ write_one:
 	movwf	INDF2, A
 	movlw	0x1
 	call	LCD_Write_Message
+	return
 	
 input_answer:
 	call	key_control_noclr
@@ -83,9 +89,13 @@ input_answer:
 	movlw	0x3E
 	cpfseq	counter_kp
 	goto	ia_lp
-	goto	test
-ia_lp:	movff	counter_kp, POSTINC1
-	incf	ia_count
+	call	test
+	return
+	
+ia_lp:	movlw	0x30
+	subwf	counter_kp
+	movff	counter_kp, POSTINC1
+	incf	counterMG
 	goto	input_answer
 	
 test:
@@ -94,13 +104,13 @@ test:
 	
 	
 multiply_test:
-	movf	rng_count, W
+	movf	delay_count, W
 	
 	call	multiplyRNG1
-	incf	rng_count
-	movf	rng_count, W
+	incf	delay_count
+	movf	delay_count, W
 	call	multiplyRNG2
-	incf	rng_count
+	incf	delay_count
 	call	h2d_16bit
 	return
 	
@@ -115,13 +125,25 @@ test2lp:
 	movf	POSTINC2, W
 	cpfseq	POSTINC1
 	goto	fail
-	decfsz	ia_count
+	decfsz	counterMG
 	bra	test2lp
-	return
+	goto	success
+	;return
 	
 fail:
-	goto	loop_game1
-	movlw	0x4
-	movwf	0x60
-
+	movlw	0xff
+	clrf	TRISF, A
+	clrf	LATF, A
+	movwf	LATF, A
+	goto	xd1
+	goto	$
+	
+success:
+	movlw	0x10
+	clrf	TRISF, A
+	clrf	LATF, A
+	movwf	LATF, A
+	incf	score
+	goto	xd1
+	goto	$
 	
