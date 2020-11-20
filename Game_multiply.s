@@ -24,6 +24,7 @@ Multiplygame_1:
 	movlw	0x0
 	movwf	delay_count, A
 	movwf	counterMG, A
+	movwf	score, A
 loop_game1: 
 	
 	lfsr	0, random_numbers
@@ -143,7 +144,7 @@ success:
 	clrf	TRISF, A
 	clrf	LATF, A
 	movwf	LATF, A
-	incf	score
+	incf	score,1 , 0
 	goto	xd1
 	goto	$
 	
