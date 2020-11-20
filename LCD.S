@@ -1,6 +1,6 @@
 #include <xc.inc>
 
-global  LCD_Setup, LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off, display_clear, LCD_delay_ms
+global  LCD_Setup, LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off, display_clear, LCD_delay_ms, delay_1s
 
 psect	udata_acs   ; named variables in access ram
 LCD_cnt_l:	ds 1   ; reserve 1 byte for variable LCD_cnt_l
@@ -8,6 +8,7 @@ LCD_cnt_h:	ds 1   ; reserve 1 byte for variable LCD_cnt_h
 LCD_cnt_ms:	ds 1   ; reserve 1 byte for ms counter
 LCD_tmp:	ds 1   ; reserve 1 byte for temporary use
 LCD_counter:	ds 1   ; reserve 1 byte for counting through nessage
+count_1s:	ds 1	; reserve 1 byte for delay_1s
 
 	LCD_E	EQU 5	; LCD enable bit
     	LCD_RS	EQU 4	; LCD register select bit
@@ -105,7 +106,17 @@ LCD_Enable:	    ; pulse enable bit LCD_E for 500ns
 	bcf	LATB, LCD_E, A	    ; Writes data to LCD
 	return
     
-; ** a few delay routines below here as LCD timing can be quite critical ****
+delay_1s:
+	movlw	0x4
+	movwf	count_1s, A
+d1slp:	movlw	250
+	call	LCD_delay_ms
+	decfsz	count_1s
+	bra	d1slp
+	return
+	
+	
+	; ** a few delay routines below here as LCD timing can be quite critical ****
 LCD_delay_ms:		    ; delay given in ms in W
 	movwf	LCD_cnt_ms, A
 lcdlp2:	movlw	250	    ; 1 ms delay

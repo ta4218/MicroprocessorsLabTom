@@ -1,10 +1,12 @@
     #include <pic18_chip_select.inc>
     #include <xc.inc>
 
-global	setupRNG
+global	setupRNG, multiplyRNG1, multiplyRNG2
 psect    udata_bank4
 RANDOM:     ds  1        ;reserve 1 byte for RANDOM variable
 counterRNG:    ds  1
+vari:	    ds  1
+vari2:	ds  1
     
     
 psect    RNG_code, class=CODE    
@@ -65,5 +67,15 @@ saveRNG:
     movwf   POSTINC0, A        ;    load LFSR0 with W and increment LFSR
     decfsz  counterRNG, A        ;    decrement counter to count down from 10
     return
+    
+multiplyRNG1:
+    lfsr    2, myArrayRNG
+    movff    PLUSW2, vari
+    return
+multiplyRNG2:
+    movff   PLUSW2, vari2
+    movf    vari2, W
+    mulwf   vari
+    
 
 

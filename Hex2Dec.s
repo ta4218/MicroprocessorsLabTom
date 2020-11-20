@@ -1,6 +1,6 @@
 #include <xc.inc>
 
-global	multiply, multiply_16, multiply_24, h2d_setup, ascii, random_numbers
+global	multiply, multiply_16, multiply_24, h2d_setup,h2d_16bit, ascii, random_numbers
 psect	udata_acs
 sixteen:	ds  2
 sixteen_low:	ds  1
@@ -108,12 +108,12 @@ h2d_setup:
     movwf   rng_counter, A
     lfsr    2, random_numbers
 rn_loop:
-    call    h2d
+    call    h2d_8bit
     decfsz  rng_counter
     bra	    rn_loop
     return
 
-h2d:
+h2d_8bit:
     movlw   0x8A
     movwf   k_low, A
     movlw   0x41
@@ -135,6 +135,31 @@ h2d:
     movff   threetwo_high, POSTINC1
     movlw   3
     movwf   h2d_count, A
+    goto    h2d_loop
+    
+h2d_16bit:
+    movlw   0x8A
+    movwf   k_low, A
+    movlw   0x41
+    movwf   k_high, A
+    
+    movff   k_low, sixteen_low_two
+    movff   k_high, sixteen_high_two
+    
+   
+    movff   PRODH, hex_high
+    ;movlw   0x98
+    movff   PRODL, hex_low
+    
+    
+    movff   hex_low, sixteen_low
+    movff   hex_high, sixteen_high
+    call    multiply_16
+    lfsr    1, deci
+    movff   threetwo_high, POSTINC1
+    movlw   3
+    movwf   h2d_count, A
+    goto    h2d_loop
     
 h2d_loop:
     movlw   0x0A
@@ -146,13 +171,13 @@ h2d_loop:
     movff   threetwo_high, POSTINC1
     decfsz  h2d_count
     bra	    h2d_loop
-    
+    lfsr    1, deci
+    return
     
 ascii:
 	movlw   0x5
 	movwf   ascii_count, A
 	lfsr    1, deci
-	;lfsr    2, deci2
 	
 tst0:   decfsz  ascii_count, A
 	tstfsz  INDF1
