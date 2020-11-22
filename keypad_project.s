@@ -1,6 +1,6 @@
 #include <xc.inc>
 
-global  keypad_setup, key_control,key_control_noclr, counter_kp, get_key, combined_input, counter_kp
+global  keypad_setup, key_control,key_control_noclr, counter_kp, get_key, combined_input
 extrn	display_clear, LCD_Write_Message
 
      

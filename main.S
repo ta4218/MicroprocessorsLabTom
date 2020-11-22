@@ -4,9 +4,8 @@ extrn	LCD_Setup, delay_1s
 extrn	keypad_setup,  start_logo, game_select, key_control, counter_kp, display_clear
 extrn	DAC_Setup, DAC_Int_Hi
 extrn	setupRNG, Multiplygame_1
-extrn   h2d_setup, ascii
+extrn   h2d_setup, ascii, result_LCD, add_game
 ;extrn	start_test
-    
 psect	code, abs	
 rst: 	org	0x0
  	goto	setup
@@ -51,8 +50,14 @@ test2:
 game_1:
 	call	display_clear
 	call	Multiplygame_1
+	call	result_LCD
+	goto	rst	
 
 game_2:	
 	movff	counter_kp, LATD, A
-;	goto	$
+	call	add_game
+	call	result_LCD
+	goto	rst
+	
+	goto	$
 			

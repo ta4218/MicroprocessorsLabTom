@@ -1,8 +1,8 @@
 #include <xc.inc>
     
 extrn	LCD_Write_Message, cursor_off, random_numbers, display_clear, key_control, key_control_noclr,delay_1s
-extrn	counter_kp, multiplyRNG1, multiplyRNG2, h2d_16bit    
-global	Multiplygame_1
+extrn	counter_kp, multiplyRNG1, multiplyRNG2, h2d_16bitmulti   
+global	Multiplygame_1, write_one
 
 psect	udata_acs   ; reserve data space in access ram
 counterMG:    ds 1    ; reserve one byte for a counter variable
@@ -10,12 +10,11 @@ delay_count:ds 1    ; reserve one byte for counter in the delay routine
 table_counter: ds 1
 LCD_variable:  ds 1
 user_answer:   ds   4
-ia_count:	ds  1
-rng_count:	ds  1
 score:	    ds  1
     
 psect	udata_bank4 ; reserve data anywhere in RAM (here at 0x400)
 myArrayMG:    ds 0xA ; reserve 128 bytes for message data
+
 
     
 psect	MG_code, class= CODE	
@@ -63,10 +62,11 @@ xd:	call	delay_1s
 	lfsr	1, user_answer
 	call	input_answer	
 xd1:	incf	table_counter
-	movlw	0x6
+	movlw	0x4
 	cpfseq	table_counter
 	bra	xd
-	goto	$
+	movf	score, W
+	return
 	
 write_rn:
 	call	rn_one
@@ -77,6 +77,7 @@ rn_one:
 	movff	POSTINC0, INDF2
 	return
 write_one:
+	lfsr	2, LCD_variable
 	movwf	INDF2, A
 	movlw	0x1
 	call	LCD_Write_Message
@@ -89,7 +90,7 @@ input_answer:
 	
 	movlw	0x3E
 	cpfseq	counter_kp
-	goto	ia_lp
+	bra	ia_lp
 	call	test
 	return
 	
@@ -97,11 +98,12 @@ ia_lp:	movlw	0x30
 	subwf	counter_kp
 	movff	counter_kp, POSTINC1
 	incf	counterMG
-	goto	input_answer
+	bra	input_answer
 	
 test:
 	call	multiply_test
-	goto	test2
+	call	test2
+	return
 	
 	
 multiply_test:
@@ -112,39 +114,45 @@ multiply_test:
 	movf	delay_count, W
 	call	multiplyRNG2
 	incf	delay_count
-	call	h2d_16bit
+	call	h2d_16bitmulti
 	return
 	
 test2:
 	lfsr	2, user_answer
 	movlw	0x0
 	cpfseq	INDF1
-	goto	test2lp
+	bra	test2lp
 	addwf	POSTINC1
 	bra	test2
 test2lp:	
 	movf	POSTINC2, W
 	cpfseq	POSTINC1
-	goto	fail
+	bra	fail
 	decfsz	counterMG
 	bra	test2lp
-	goto	success
+	bra	success
 	;return
 	
 fail:
 	movlw	0xff
-	clrf	TRISF, A
-	clrf	LATF, A
+	clrf	TRISF
+	clrf	LATF
 	movwf	LATF, A
-	goto	xd1
+	return
+	;goto	xd1
 	goto	$
 	
 success:
 	movlw	0x10
-	clrf	TRISF, A
-	clrf	LATF, A
+	clrf	TRISF
+	clrf	LATF
 	movwf	LATF, A
-	incf	score,1 , 0
-	goto	xd1
+	incf	score, 1 , 0
+	return
+	;goto	xd1
 	goto	$
+	
+	
+	
+    
 	

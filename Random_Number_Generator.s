@@ -1,7 +1,7 @@
     #include <pic18_chip_select.inc>
     #include <xc.inc>
 
-global	setupRNG, multiplyRNG1, multiplyRNG2
+global	setupRNG, multiplyRNG1, multiplyRNG2, addRNG2, addRNG1
 psect    udata_bank4
 RANDOM:     ds  1        ;reserve 1 byte for RANDOM variable
 counterRNG:    ds  1
@@ -77,6 +77,18 @@ multiplyRNG2:
     movf    vari2, W
     mulwf   vari
     return
+    
+addRNG1:
+    lfsr    2, myArrayRNG
+    movff    PLUSW2, vari
+    return
+addRNG2:
+    movff   PLUSW2, vari2
+    movf    vari2, W
+    addwf   vari, 0, 0
+    return
+    
+
     
 
 
