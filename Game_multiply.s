@@ -11,6 +11,7 @@ table_counter: ds 1
 LCD_variable:  ds 1
 user_answer:   ds   4
 score:	    ds  1
+four:	    ds  1
     
 psect	udata_bank4 ; reserve data anywhere in RAM (here at 0x400)
 myArrayMG:    ds 0xA ; reserve 128 bytes for message data
@@ -24,6 +25,8 @@ Multiplygame_1:
 	movwf	delay_count, A
 	movwf	counterMG, A
 	movwf	score, A
+	movlw	0x4
+	movwf	four, A
 loop_game1: 
 	
 	lfsr	0, random_numbers
@@ -97,7 +100,6 @@ input_answer:
 ia_lp:	movlw	0x30
 	subwf	counter_kp
 	movff	counter_kp, POSTINC1
-	incf	counterMG
 	bra	input_answer
 	
 test:
@@ -121,9 +123,14 @@ test2:
 	lfsr	2, user_answer
 	movlw	0x0
 	cpfseq	INDF1
-	bra	test2lp
+	bra	counter_calc
 	addwf	POSTINC1
+	incf	counterMG, F, A
 	bra	test2
+counter_calc:
+	movf	counterMG, W, A
+	subwf	four
+	movff	four, counterMG
 test2lp:	
 	movf	POSTINC2, W
 	cpfseq	POSTINC1

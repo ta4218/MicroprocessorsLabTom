@@ -1,10 +1,10 @@
 #include <xc.inc>
 
 extrn	LCD_Setup, delay_1s
-extrn	keypad_setup,  start_logo, game_select, key_control, counter_kp, display_clear
+extrn	keypad_setup,  start_logo, game_select, key_control, counter_kp, display_clear, cursor_off
 extrn	DAC_Setup, DAC_Int_Hi
 extrn	setupRNG, Multiplygame_1
-extrn   h2d_setup, ascii, result_LCD, add_game
+extrn   h2d_setup, ascii, result_LCD, add_game, play_again
 ;extrn	start_test
 psect	code, abs	
 rst: 	org	0x0
@@ -51,13 +51,38 @@ game_1:
 	call	display_clear
 	call	Multiplygame_1
 	call	result_LCD
-	goto	rst	
+	call	display_clear
+	call	play_again
+	call	cursor_off
+	goto	pa_loop	
 
 game_2:	
 	movff	counter_kp, LATD, A
 	call	add_game
 	call	result_LCD
+	call	display_clear
+	call	play_again
+	call	cursor_off
+	goto	pa_loop
+
+pa_loop:    
+	call	key_control
+	
+key_test:
+	movlw	0x32
+	cpfsgt	counter_kp
+	goto	yes_or_no
+	goto	pa_loop
+	
+yes_or_no:
+	movlw	0x32
+	cpfslt	counter_kp
+	goto	LCD_off
 	goto	rst
 	
-	goto	$
+LCD_off:
+	call	display_clear
+	call	cursor_off
+	end	rst
+	
 			
