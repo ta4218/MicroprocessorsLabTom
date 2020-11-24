@@ -151,7 +151,7 @@ second_line:
         return
     
 cursor_off:
-	movlw	00000100B	; display on, cursor on, blinking on
+	movlw	000001100B	; display on, cursor on, blinking on
 	call	LCD_Send_Byte_I
 	movlw	10		; wait 40us
 	call	LCD_delay_x4us

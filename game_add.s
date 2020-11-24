@@ -12,6 +12,7 @@ user_answer_add:   ds   3
 score_add:	    ds  1
 rn_array_pointer:   ds	1
 add_answer:	    ds  1
+fouradd:	    ds  1
     
 psect	udata_bank4 ; reserve data anywhere in RAM (here at 0x400)
 
@@ -21,7 +22,6 @@ psect	MG_code, class= CODE
 	
 add_game: 	
 	movlw	0x0
-	movwf	counter_keyinput, A
 	movwf	score_add, A
 	movwf   rn_array_pointer, A
 	lfsr	0, random_numbers
@@ -29,7 +29,12 @@ add_game:
 	movlw	0x1
 	movwf	question_no, A
 	
-addgamelp:	
+addgamelp:
+    
+	movlw	0x0
+	movwf	counter_keyinput, A
+	movlw	0x4
+	movwf	fouradd, A
 	call	delay_1s
     
 	lfsr	2, LCD_variable_add
@@ -97,7 +102,6 @@ ia_lpadd:
 	movlw	0x30
 	subwf	counter_kp
 	movff	counter_kp, POSTINC1
-	incf	counter_keyinput
 	bra	input_answer_add
 	
 testa:
@@ -120,11 +124,17 @@ testa:
 
 add_test2:
 	lfsr	2, user_answer_add
-	movlw	0x0
 	cpfseq	INDF1
-	bra	add_test3
+	bra	counter_calc_add
+	movlw	0x0
 	addwf	POSTINC1
 	bra	add_test2
+
+counter_calc_add:
+	movf	counter_keyinput, W, A
+	subwf	fouradd, F, A
+	movff	fouradd, counter_keyinput
+
 add_test3:	
 	movf	POSTINC2, W
 	cpfseq	POSTINC1

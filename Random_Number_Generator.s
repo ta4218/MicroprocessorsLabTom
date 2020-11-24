@@ -15,7 +15,7 @@ psect    RNG_code, class=CODE
 setupRNG:    
     bcf    CFGS
     bsf    EEPGD
-    movlw    0x35        ; set 0x21 as seed
+    movf   TMR0, W        ; set 0x21 as seed
     goto    startRNG
     
 myTableRNG:
@@ -85,7 +85,7 @@ addRNG1:
 addRNG2:
     movff   PLUSW2, vari2
     movf    vari2, W
-    addwf   vari, 0, 0
+    addwf   vari, W, A
     return
     
 

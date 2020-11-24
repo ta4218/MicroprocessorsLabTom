@@ -23,10 +23,8 @@ psect	MG_code, class= CODE
 Multiplygame_1: 	
 	movlw	0x0
 	movwf	delay_count, A
-	movwf	counterMG, A
 	movwf	score, A
-	movlw	0x4
-	movwf	four, A
+	
 loop_game1: 
 	
 	lfsr	0, random_numbers
@@ -34,7 +32,12 @@ loop_game1:
 	movlw	0x1
 	movwf	table_counter, A
 	
-xd:	call	delay_1s
+xd:	movlw	0x0
+	movwf	counterMG, A
+	movlw	0x4
+	movwf	four, A
+	
+	call	delay_1s
     
 	lfsr	2, LCD_variable
 	call	display_clear
@@ -93,6 +96,7 @@ input_answer:
 	
 	movlw	0x3E
 	cpfseq	counter_kp
+	
 	bra	ia_lp
 	call	test
 	return
@@ -121,15 +125,16 @@ multiply_test:
 	
 test2:
 	lfsr	2, user_answer
-	movlw	0x0
+	
 	cpfseq	INDF1
 	bra	counter_calc
+	movlw	0x0
 	addwf	POSTINC1
 	incf	counterMG, F, A
 	bra	test2
 counter_calc:
 	movf	counterMG, W, A
-	subwf	four
+	subwf	four, F, A
 	movff	four, counterMG
 test2lp:	
 	movf	POSTINC2, W

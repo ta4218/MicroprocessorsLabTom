@@ -6,8 +6,13 @@ extrn	DAC_Setup, DAC_Int_Hi
 extrn	setupRNG, Multiplygame_1
 extrn   h2d_setup, ascii, result_LCD, add_game, play_again
 ;extrn	start_test
+psect	udata_acs
+on_off:	    ds  1
+    
 psect	code, abs	
 rst: 	org	0x0
+	movlw	0x0
+	movwf	on_off, A
  	goto	setup
 
 int_hi:	org	0x0008	; high vector, no low vector
@@ -15,7 +20,7 @@ int_hi:	org	0x0008	; high vector, no low vector
 	goto	DAC_Int_Hi	
 
 	; ******* Programme FLASH read Setup Code ***********************
-setup:	;call	start_test
+setup:	
 	bcf	CFGS	; point to Flash program memory  
 	bsf	EEPGD 	; access Flash program memory
 	call	LCD_Setup	; setup UART
@@ -23,9 +28,10 @@ setup:	;call	start_test
 	call	DAC_Setup
 	call	setupRNG
 	call	h2d_setup
-	;call	ascii
+	movlw	0x1
+	cpfsgt	on_off
+	goto	LCD_off
 	goto	start
-
 start:
 	call	start_logo
 	call	delay_1s
@@ -78,11 +84,18 @@ yes_or_no:
 	movlw	0x32
 	cpfslt	counter_kp
 	goto	LCD_off
-	goto	rst
+	goto	setup
 	
 LCD_off:
-	call	display_clear
 	call	cursor_off
-	end	rst
+	call	display_clear
+	call	key_control
+	movlw	0x3D
+	cpfseq	counter_kp
+	bra	LCD_off
+	incf	on_off, A
+	goto	setup
+
+	
 	
 			
