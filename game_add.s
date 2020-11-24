@@ -105,7 +105,7 @@ ia_lpadd:
 	bra	input_answer_add
 	
 testa:
-	lfsr	2, user_answer_add
+	;lfsr	2, user_answer_add
 	call    add_test
 	call	add_test2
 	return
@@ -124,10 +124,12 @@ testa:
 
 add_test2:
 	lfsr	2, user_answer_add
+	movlw	0x0
 	cpfseq	INDF1
 	bra	counter_calc_add
 	movlw	0x0
 	addwf	POSTINC1
+	incf	counter_keyinput, A
 	bra	add_test2
 
 counter_calc_add:

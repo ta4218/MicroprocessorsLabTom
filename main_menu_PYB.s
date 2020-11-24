@@ -74,6 +74,8 @@ game_select:
 	call	cursor_off
 	
 	call	delay_1s
+	call	delay_1s
+	call	delay_1s
 	
 	call	display_clear
 	movlw	0x11

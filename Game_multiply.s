@@ -125,7 +125,7 @@ multiply_test:
 	
 test2:
 	lfsr	2, user_answer
-	
+	movlw	0x0
 	cpfseq	INDF1
 	bra	counter_calc
 	movlw	0x0

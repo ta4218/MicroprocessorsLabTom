@@ -35,6 +35,7 @@ setup:
 start:
 	call	start_logo
 	call	delay_1s
+	call	delay_1s
 	;interrupt 10 second
 	call	game_select
 	;no interrupt needed
@@ -73,6 +74,7 @@ game_2:
 
 pa_loop:    
 	call	key_control
+	call	display_clear
 	
 key_test:
 	movlw	0x32
