@@ -19,7 +19,7 @@ int_hi:	org	0x0008	; high vector, no low vector
 
 	goto	DAC_Int_Hi	
 
-	; ******* Programme FLASH read Setup Code ***********************
+	; ******* Programme FLASH read Setup Code *********************** ****
 setup:	
 	bcf	CFGS	; point to Flash program memory  
 	bsf	EEPGD 	; access Flash program memory
