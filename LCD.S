@@ -1,6 +1,6 @@
 #include <xc.inc>
 
-global  LCD_Setup, LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off, display_clear, LCD_delay_ms, delay_1s
+global  LCD_Setup, LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off, display_clear, LCD_delay_ms, delay_1s, smiley
 
 psect	udata_acs   ; named variables in access ram
 LCD_cnt_l:	ds 1   ; reserve 1 byte for variable LCD_cnt_l
@@ -162,6 +162,13 @@ display_clear:
 	call	LCD_Send_Byte_I
 	movlw	2		; wait 2ms
 	call	LCD_delay_ms
+	return
+	
+smiley:
+	movlw	0011001110B
+	call	LCD_Send_Byte_I
+	movlw	10
+	call	LCD_delay_x4us
 	return
 
     end

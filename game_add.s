@@ -1,7 +1,7 @@
 #include <xc.inc>
     
 extrn	LCD_Write_Message, cursor_off, random_numbers, display_clear, key_control, key_control_noclr,delay_1s
-extrn	counter_kp, addRNG1, addRNG2, h2d_16bitadd 
+extrn	counter_kp, addRNG1, addRNG2, h2d_16bitadd , smiley
 global	add_game
 
 psect	udata_acs   ; reserve data space in access ram
@@ -147,23 +147,25 @@ add_test3:
 	;return
 	
 failadd:
-	movlw	0xff
-	clrf	TRISF
-	clrf	LATF
-	movwf	LATF, A
+	call	smiley
+	movlw	0x3A
+	call	write_oneadd
+	movlw	0x28
+	call	write_oneadd
+	call	delay_1s
 	return
-	;goto	xd1
-	goto	$
+	
 	
 successadd:
-	movlw	0x10
-	clrf	TRISF
-	clrf	LATF
-	movwf	LATF, A
+	call	smiley
+	movlw	0x3A
+	call	write_oneadd
+	movlw	0x29
+	call	write_oneadd
+	call	delay_1s
 	incf	score_add, 1 , 0
 	return
-	;goto	xd1
-	goto	$
+
 	
 	
 	

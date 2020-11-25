@@ -12,7 +12,7 @@ on_off:	    ds  1
 psect	code, abs	
 rst: 	org	0x0
 	movlw	0x0
-	movwf	on_off, A
+	movwf	on_off, A	
  	goto	setup
 
 int_hi:	org	0x0008	; high vector, no low vector
@@ -25,7 +25,14 @@ setup:
 	bsf	EEPGD 	; access Flash program memory
 	call	LCD_Setup	; setup UART
 	call	keypad_setup
+	movlw	0x1
+	cpfsgt	on_off
 	call	DAC_Setup
+	movlw	0x1
+	cpfsgt	on_off
+	call	timer3_setup
+	
+	
 	call	setupRNG
 	call	h2d_setup
 	movlw	0x1
@@ -64,6 +71,7 @@ game_1:
 	goto	pa_loop	
 
 game_2:	
+	call	display_clear
 	movff	counter_kp, LATD, A
 	call	add_game
 	call	result_LCD
@@ -98,6 +106,9 @@ LCD_off:
 	incf	on_off, A
 	goto	setup
 
-	
+timer3_setup:
+	movlw	10100011B	
+	movwf	T3CON, A
+	return
 	
 			

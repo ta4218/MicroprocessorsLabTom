@@ -1,7 +1,7 @@
 #include <xc.inc>
     
 extrn	LCD_Write_Message, cursor_off, random_numbers, display_clear, key_control, key_control_noclr,delay_1s
-extrn	counter_kp, multiplyRNG1, multiplyRNG2, h2d_16bitmulti   
+extrn	counter_kp, multiplyRNG1, multiplyRNG2, h2d_16bitmulti, second_line, smiley
 global	Multiplygame_1, write_one
 
 psect	udata_acs   ; reserve data space in access ram
@@ -12,6 +12,7 @@ LCD_variable:  ds 1
 user_answer:   ds   4
 score:	    ds  1
 four:	    ds  1
+
     
 psect	udata_bank4 ; reserve data anywhere in RAM (here at 0x400)
 myArrayMG:    ds 0xA ; reserve 128 bytes for message data
@@ -145,24 +146,25 @@ test2lp:
 	bra	success
 	;return
 	
-fail:
-	movlw	0xff
-	clrf	TRISF
-	clrf	LATF
-	movwf	LATF, A
+fail:	
+	call	smiley
+	movlw	0x3A
+	call	write_one
+	movlw	0x28
+	call	write_one
+	call	delay_1s
+	
 	return
-	;goto	xd1
-	goto	$
 	
 success:
-	movlw	0x10
-	clrf	TRISF
-	clrf	LATF
-	movwf	LATF, A
+	call	smiley
+	movlw	0x3A
+	call	write_one
+	movlw	0x29
+	call	write_one
+	call	delay_1s
 	incf	score, 1 , 0
 	return
-	;goto	xd1
-	goto	$
 	
 	
 	

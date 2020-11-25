@@ -15,7 +15,7 @@ psect    RNG_code, class=CODE
 setupRNG:    
     bcf    CFGS
     bsf    EEPGD
-    movf   TMR0, W        ; set 0x21 as seed
+    movf   TMR3L, W        ; set 0x21 as seed
     goto    startRNG
     
 myTableRNG:
