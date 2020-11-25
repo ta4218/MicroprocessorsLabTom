@@ -1,6 +1,6 @@
 #include <xc.inc>
 
-global	h2d_16bit, ascii, h2d_hex_low, h2d_hex_high, random_numbers, h2d_rng
+global	h2d_16bit, ascii, h2d_hex_low, h2d_hex_high, random_numbers, h2d_rng, call_random_no
 psect	udata_acs
 sixteen:	ds  2
 sixteen_low:	ds  1
@@ -32,6 +32,7 @@ h2d_count:	ds  1
 ascii_count:	ds  1
 random_numbers:	ds  20
 rng_counter:	ds  1
+;rn_length:	ds  1
   
 
 psect	h2d_code, class=CODE
@@ -157,6 +158,14 @@ h2d_loop:
     bra	    h2d_loop
     lfsr    1, deci
     return
+
+call_random_no:
+    ;movlw   0x0
+    ;movwf   rn_length, A
+    ;call    ascii
+    lfsr    1, deci
+    ;movf    rn_length, W
+    return
     
 ascii:
 	movlw   0x5
@@ -169,9 +178,11 @@ tst0:   decfsz  ascii_count
 	movlw	0
 	addwf	POSTINC1
 	bra	tst0    
-ascii_loop:    
+ascii_loop:
+    ;incf    rn_length, A
     movlw   0x30
-    addwf   POSTINC1, 0, 0
+    addwf   POSTINC1, W, A
+    ;movff   POSTINC1, POSTINC2
     movwf   POSTINC2, 0   
     decfsz  ascii_count
     bra	    ascii_loop

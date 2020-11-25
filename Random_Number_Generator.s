@@ -1,4 +1,3 @@
-    #include <pic18_chip_select.inc>
     #include <xc.inc>
 
 global	setupRNG, multiplyRNG1, multiplyRNG2, addRNG2, addRNG1 

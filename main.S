@@ -1,10 +1,10 @@
 #include <xc.inc>
 
-extrn	LCD_Setup, delay_1s
+extrn	LCD_Setup, delay_500ms
 extrn	keypad_setup,  start_logo, game_select, key_control, counter_kp, display_clear, cursor_off
 extrn	DAC_Setup, DAC_Int_Hi
-extrn	setupRNG, Multiplygame_1
-extrn   result_LCD, add_game, play_again
+extrn	setupRNG, game_setup
+extrn   result_LCD, play_again
 
 psect	udata_acs
 on_off:	    ds  1
@@ -34,46 +34,48 @@ setup:
 	
 	
 	call	setupRNG
-	;call	h2d_rng
+	
 	movlw	0x1
 	cpfsgt	on_off
 	goto	LCD_off
 	goto	start
+
 start:
 	call	start_logo
-	call	delay_1s
-	call	delay_1s
+
+	movlw	0x8
+	call	delay_500ms
 	;interrupt 10 second
 	call	game_select
 	;no interrupt needed
 loop:	call	key_control
-	
-	
-test:	
+		
+test_gt2:	
 	movlw	0x32
 	cpfsgt	counter_kp
-	goto	test2
+	goto	test_lt1
 	goto	loop
-	
-test2:	
+test_lt1:
+	movlw	0x31
+	cpfslt	counter_kp
+	goto	select
+	goto	loop
+select:	
 	movlw	0x32
 	cpfslt	counter_kp
 	goto	game_2
 	goto	game_1
 	
 game_1:
-	call	display_clear
-	call	Multiplygame_1
-	call	result_LCD
-	call	display_clear
-	call	play_again
-	call	cursor_off
-	goto	pa_loop	
+	movlw	0x1
+	goto	game_both
 
 game_2:	
-	call	display_clear
-	;movff	counter_kp, LATD, A
-	call	add_game
+	movlw	0x2
+	goto	game_both
+
+game_both:
+	call	game_setup
 	call	result_LCD
 	call	display_clear
 	call	play_again
@@ -82,12 +84,17 @@ game_2:
 
 pa_loop:    
 	call	key_control
-	call	display_clear
 	
 key_test:
 	movlw	0x32
 	cpfsgt	counter_kp
 	goto	yes_or_no
+	goto	pa_loop
+	
+zero_test:
+	movlw	0x31
+	cpfslt	counter_kp
+	goto	select
 	goto	pa_loop
 	
 yes_or_no:

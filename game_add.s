@@ -74,24 +74,24 @@ addgamelp:
 	return
 		
 testa:
-	call    add_test
+    ;call    add_test
 	call	add_test2
 	return
- add_test:
-	movf	rn_array_pointer, W
+ ;add_test:
+;	movf	rn_array_pointer, W
 	
-	call	addRNG1
-	incf	rn_array_pointer
-	movf	rn_array_pointer, W
-	call	addRNG2
-	incf	rn_array_pointer
+;	call	addRNG1
+;	incf	rn_array_pointer
+;	movf	rn_array_pointer, W
+;	call	addRNG2
+;	incf	rn_array_pointer
 	;movwf	INDF0, A
 	;lfsr	2, add_answer
-	call	h2d_hex_low
-	movlw	0x00
-	call	h2d_hex_high
-	call	h2d_16bit
-	return   
+;	call	h2d_hex_low
+;	movlw	0x00
+;	call	h2d_hex_high
+;	call	h2d_16bit
+;	return   
 
 add_test2:
 	lfsr	2, user_answer_add
@@ -120,18 +120,18 @@ add_test3:
 failadd:
 	call	smiley
 	movlw	0x3A
-	call	write_oneadd
+	call	write_one
 	movlw	0x28
-	call	write_oneadd
+	call	write_one
 	call	delay_1s
 	return
 	
 successadd:
 	call	smiley
 	movlw	0x3A
-	call	write_oneadd
+	call	write_one
 	movlw	0x29
-	call	write_oneadd
+	call	write_one
 	call	delay_1s
 	incf	score_add, 1 , 0
 	return

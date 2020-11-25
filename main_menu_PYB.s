@@ -1,7 +1,8 @@
 #include <xc.inc>
     
-extrn	LCD_Setup, LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off, display_clear, delay_1s
-extrn	keypad_setup, DAC_Setup, DAC_Int_Hi, get_key, combined_input, write_one
+extrn	LCD_Setup, LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off, display_clear
+extrn	write_one, delay_500ms
+    
 global	start_logo, game_select, result_LCD
 psect	udata_acs   ; reserve data space in access ram
 counter:    ds 1    ; reserve one byte for a counter variable
@@ -73,9 +74,8 @@ game_select:
 	call	LCD_Write_Message
 	call	cursor_off
 	
-	call	delay_1s
-	call	delay_1s
-	call	delay_1s
+	movlw	0x8
+	call	delay_500ms
 	
 	call	display_clear
 	movlw	0x11
@@ -120,7 +120,8 @@ rltlp:	movf	result_index, W
 	movlw	0x33
 	call	write_one
 	call	cursor_off
-	call	delay_1s
+	movlw	0x8
+	call	delay_500ms
 	
 	return
 

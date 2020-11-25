@@ -1,6 +1,7 @@
 #include <xc.inc>
     
-extrn	LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off, display_clear, delay_1s,key_control, counter_kp
+extrn	LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off 
+extrn	display_clear, delay_500ms,key_control, counter_kp
 
 global	play_again
     
@@ -47,7 +48,8 @@ pa_loop:
 	addlw	0xff
 	call	LCD_Write_Message
 	call	cursor_off
-	call	delay_1s
+	movlw	0x2
+	call	delay_500ms
 	return
 
 

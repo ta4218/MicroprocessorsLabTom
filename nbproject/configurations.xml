@@ -20,9 +20,8 @@
       <itemPath>main_menu_PYB.s</itemPath>
       <itemPath>Random_Number_Generator.s</itemPath>
       <itemPath>Hex2Dec.s</itemPath>
-      <itemPath>game_add.s</itemPath>
       <itemPath>play_again2.s</itemPath>
-      <itemPath>game_multiply.s</itemPath>
+      <itemPath>game.s</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -629,7 +628,7 @@
         <property key="communication.interface" value=""/>
         <property key="communication.interface.jtag" value="2wire"/>
         <property key="communication.speed" value="${communication.speed.default}"/>
-        <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="debugoptions.useswbreakpoints" value="true"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>
         <property key="memories.configurationmemory" value="true"/>
