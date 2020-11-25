@@ -1,7 +1,7 @@
 #include <xc.inc>
 	
 global	DAC_Setup, DAC_Int_Hi
-extrn	get_key, combined_input
+extrn	get_key
 
    
     
@@ -24,6 +24,6 @@ DAC_Setup:
 	bsf	GIE		; Enable all interrupts
 	return
 	
-	end
+	;end
 
 

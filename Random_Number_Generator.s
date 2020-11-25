@@ -1,12 +1,15 @@
     #include <pic18_chip_select.inc>
     #include <xc.inc>
 
-global	setupRNG, multiplyRNG1, multiplyRNG2, addRNG2, addRNG1
-psect    udata_bank4
+global	setupRNG, multiplyRNG1, multiplyRNG2, addRNG2, addRNG1 
+extrn	h2d_rng
+    
+psect    udata_acs
 RANDOM:     ds  1        ;reserve 1 byte for RANDOM variable
 counterRNG:    ds  1
 vari:	    ds  1
 vari2:	ds  1
+
     
     
 psect    RNG_code, class=CODE    
@@ -15,8 +18,8 @@ psect    RNG_code, class=CODE
 setupRNG:    
     bcf    CFGS
     bsf    EEPGD
-    movf   TMR3L, W        ; set 0x21 as seed
-    goto    startRNG
+    movf   TMR3L, W        ; set TIMER3 as seed
+    goto   startRNG
     
 myTableRNG:
     myArrayRNG     EQU 0x500    ; adress in RAM for RANDOM NUMBERS
@@ -35,6 +38,7 @@ loopRNG:
     tstfsz  counterRNG
     bra    loopRNG
     lfsr    0, myArrayRNG    ;load FSR0 with adress in RAM
+    call    h2d_rng
     return
     
 shiftRNG:
@@ -67,6 +71,7 @@ saveRNG:
     movwf   POSTINC0, A        ;    load LFSR0 with W and increment LFSR
     decfsz  counterRNG, A        ;    decrement counter to count down from 10
     return
+    
     
 multiplyRNG1:
     lfsr    2, myArrayRNG

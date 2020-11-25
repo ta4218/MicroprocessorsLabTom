@@ -1,7 +1,7 @@
 #include <xc.inc>
 
-global  keypad_setup, key_control,key_control_noclr, counter_kp, get_key, combined_input
-extrn	display_clear, LCD_Write_Message
+global  keypad_setup, key_control,key_control_noclr, counter_kp, get_key, combined_input, input_answer
+extrn	display_clear, LCD_Write_Message, delay_1s
 
      
 psect	data	; a table of values in program memory
@@ -120,7 +120,23 @@ key_control_noclr:
 	call	LCD_Write_Message
 	return
 
-
+input_answer:
+	call	key_control_noclr
+	
+	call	delay_1s
+	
+	movlw	0x3E
+	cpfseq	counter_kp
+	
+	bra	ia_lp
+	;call	test
+	return
+	
+ia_lp:	movlw	0x30
+	subwf	counter_kp
+	movff	counter_kp, POSTINC1
+	bra	input_answer
+	
 delay:        
 	decfsz  kp_delay_count, f, A
 	movlw   0x10

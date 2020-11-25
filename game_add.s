@@ -1,7 +1,8 @@
 #include <xc.inc>
     
 extrn	LCD_Write_Message, cursor_off, random_numbers, display_clear, key_control, key_control_noclr,delay_1s
-extrn	counter_kp, addRNG1, addRNG2, h2d_16bitadd , smiley
+extrn	counter_kp, addRNG1, addRNG2, smiley, h2d_hex_low, h2d_hex_high, h2d_16bit
+extrn	write_rn, write_one, rn_one, input_answer	
 global	add_game
 
 psect	udata_acs   ; reserve data space in access ram
@@ -42,70 +43,37 @@ addgamelp:
 	
 	movlw	0x30
 	addwf	question_no, 0, 1
-	call	write_oneadd
+	call	write_one
 
 	
 	movlw	0x2E
-	call	write_oneadd
+	call	write_one
 
 	movlw	0x20
-	call	write_oneadd
+	call	write_one
 
-	call	write_rnadd
-	call	write_rnadd
+	call	write_rn
+	call	write_rn
 	
 	movlw	0x2B
-	call	write_oneadd
+	call	write_one
 
-	call	write_rnadd
-	call	write_rnadd
-	
+	call	write_rn
+	call	write_rn
 	movlw	0x3D
-	call	write_oneadd
+	call	write_one
 	
 	lfsr	1, user_answer_add
-	call	input_answer_add	
+	call	input_answer
+	call	testa
 	incf	question_no
 	movlw	0x4
 	cpfseq	question_no
 	bra	addgamelp
 	movf	score_add, W
 	return
-	
-write_rnadd:
-	call	rn_oneadd
-	movlw	0x1
-	call	LCD_Write_Message
-	return
-rn_oneadd:
-	movff	POSTINC0, INDF2
-	return
-write_oneadd:
-	lfsr	2, LCD_variable_add
-	movwf	INDF2, A
-	movlw	0x1
-	call	LCD_Write_Message
-	return
-	
-input_answer_add:
-	call	key_control_noclr
-	
-	call	delay_1s
-	
-	movlw	0x3E
-	cpfseq	counter_kp
-	bra	ia_lpadd
-	call	testa
-	return
-	
-ia_lpadd:	
-	movlw	0x30
-	subwf	counter_kp
-	movff	counter_kp, POSTINC1
-	bra	input_answer_add
-	
+		
 testa:
-	;lfsr	2, user_answer_add
 	call    add_test
 	call	add_test2
 	return
@@ -119,7 +87,10 @@ testa:
 	incf	rn_array_pointer
 	;movwf	INDF0, A
 	;lfsr	2, add_answer
-	call	h2d_16bitadd
+	call	h2d_hex_low
+	movlw	0x00
+	call	h2d_hex_high
+	call	h2d_16bit
 	return   
 
 add_test2:
@@ -154,7 +125,6 @@ failadd:
 	call	write_oneadd
 	call	delay_1s
 	return
-	
 	
 successadd:
 	call	smiley

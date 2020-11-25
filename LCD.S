@@ -1,7 +1,7 @@
 #include <xc.inc>
 
 global  LCD_Setup, LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off, display_clear, LCD_delay_ms, delay_1s, smiley
-
+global	write_rn, rn_one, write_one
 psect	udata_acs   ; named variables in access ram
 LCD_cnt_l:	ds 1   ; reserve 1 byte for variable LCD_cnt_l
 LCD_cnt_h:	ds 1   ; reserve 1 byte for variable LCD_cnt_h
@@ -9,6 +9,7 @@ LCD_cnt_ms:	ds 1   ; reserve 1 byte for ms counter
 LCD_tmp:	ds 1   ; reserve 1 byte for temporary use
 LCD_counter:	ds 1   ; reserve 1 byte for counting through nessage
 count_1s:	ds 1	; reserve 1 byte for delay_1s
+LCD_variable:  ds 1
 
 	LCD_E	EQU 5	; LCD enable bit
     	LCD_RS	EQU 4	; LCD register select bit
@@ -171,6 +172,18 @@ smiley:
 	call	LCD_delay_x4us
 	return
 
-    end
-
-
+write_rn:
+	call	rn_one
+	movlw	0x1
+	call	LCD_Write_Message
+	return	
+rn_one:
+	movff	POSTINC0, INDF2
+	return
+write_one:
+	lfsr	2, LCD_variable
+	movwf	INDF2, A
+	movlw	0x1
+	call	LCD_Write_Message
+	return
+	

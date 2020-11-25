@@ -4,8 +4,8 @@ extrn	LCD_Setup, delay_1s
 extrn	keypad_setup,  start_logo, game_select, key_control, counter_kp, display_clear, cursor_off
 extrn	DAC_Setup, DAC_Int_Hi
 extrn	setupRNG, Multiplygame_1
-extrn   h2d_setup, ascii, result_LCD, add_game, play_again
-;extrn	start_test
+extrn   result_LCD, add_game, play_again
+
 psect	udata_acs
 on_off:	    ds  1
     
@@ -34,7 +34,7 @@ setup:
 	
 	
 	call	setupRNG
-	call	h2d_setup
+	;call	h2d_rng
 	movlw	0x1
 	cpfsgt	on_off
 	goto	LCD_off
@@ -72,7 +72,7 @@ game_1:
 
 game_2:	
 	call	display_clear
-	movff	counter_kp, LATD, A
+	;movff	counter_kp, LATD, A
 	call	add_game
 	call	result_LCD
 	call	display_clear
@@ -103,6 +103,7 @@ LCD_off:
 	movlw	0x3D
 	cpfseq	counter_kp
 	bra	LCD_off
+	call	display_clear
 	incf	on_off, A
 	goto	setup
 

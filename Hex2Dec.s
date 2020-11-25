@@ -1,6 +1,6 @@
 #include <xc.inc>
 
-global	multiply, multiply_16, multiply_24, h2d_setup,h2d_16bitadd,h2d_16bitmulti, ascii, random_numbers, h2d_8bit_add
+global	h2d_16bit, ascii, h2d_hex_low, h2d_hex_high, random_numbers, h2d_rng
 psect	udata_acs
 sixteen:	ds  2
 sixteen_low:	ds  1
@@ -103,73 +103,28 @@ multiply_24:
     addwfc  threetwo_high, 1, 0
     return
     
-h2d_setup:
+
+h2d_rng:
     movlw   0xA
     movwf   rng_counter, A
     lfsr    2, random_numbers	    ;0x21
 rn_loop:
-    movff   POSTINC0, hex_low  ;0x1b
-    call    h2d_8bit
+    movf    POSTINC0, W
+    call    h2d_hex_low
+    movlw   0x00
+    call    h2d_hex_high
+    call    h2d_16bit
+    call    ascii
     decfsz  rng_counter
     bra	    rn_loop
     return
-
-h2d_8bit_add:
+    
+h2d_hex_low:
     movwf   hex_low, A
-    call    h2d_8bit
     return
     
-h2d_8bit:
-    movlw   0x8A
-    movwf   k_low, A
-    movlw   0x41
-    movwf   k_high, A
-    
-    movff   k_low, sixteen_low_two
-    movff   k_high, sixteen_high_two
-    
-    movlw   0x00
+h2d_hex_high:
     movwf   hex_high, A
-    ;movlw   0x98
-   
-    
-    
-    movff   hex_low, sixteen_low
-    movff   hex_high, sixteen_high
-    call    multiply_16
-    lfsr    1, deci  ;0x17
-    movff   threetwo_high, POSTINC1
-    movlw   3
-    movwf   h2d_count, A
-    goto    h2d_loop
- 
-h2d_loop:
-    movlw   0x0A
-    movwf   eight, A
-    movff   threetwo_low, twofour_low
-    movff   threetwo_middlelow, twofour_middle
-    movff   threetwo_middlehigh, twofour_high
-    call    multiply_24
-    movff   threetwo_high, POSTINC1
-    decfsz  h2d_count
-    bra	    h2d_loop
-    lfsr    1, deci
-    call    ascii
-    return
-       
-h2d_16bitmulti:
-    movff   PRODH, hex_high
-    ;movlw   0x98
-    movff   PRODL, hex_low
-    call    h2d_16bit
-    return
-    
-       
-h2d_16bitadd:
-    movwf   hex_low, A
-    movlw   0x00
-    movwf   hex_high, A
-    call    h2d_16bit
     return
 
 h2d_16bit:
@@ -188,9 +143,9 @@ h2d_16bit:
     movff   threetwo_high, POSTINC1
     movlw   3
     movwf   h2d_count, A
-    goto    h2d_loop_noascii
-    
-h2d_loop_noascii:
+    goto    h2d_loop
+
+h2d_loop:
     movlw   0x0A
     movwf   eight, A
     movff   threetwo_low, twofour_low
@@ -199,9 +154,9 @@ h2d_loop_noascii:
     call    multiply_24
     movff   threetwo_high, POSTINC1
     decfsz  h2d_count
-    bra	    h2d_loop_noascii
+    bra	    h2d_loop
     lfsr    1, deci
-  return
+    return
     
 ascii:
 	movlw   0x5
