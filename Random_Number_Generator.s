@@ -33,7 +33,7 @@ startRNG:
 loopRNG:
     call   shiftRNG
     call   outputRNG
-    movf   RANDOM, W
+    movf    RANDOM, W
     tstfsz  counterRNG
     bra    loopRNG
     lfsr    0, myArrayRNG    ;load FSR0 with adress in RAM
