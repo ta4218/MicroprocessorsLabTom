@@ -100,18 +100,15 @@ ascii:
 	return
 
 key_control:	
-	movff	combined_input, LATD ;test
+	movff	combined_input, LATD
 	movlw	0xff
 	cpfslt	combined_input, A	
 	goto	key_control
 	call	start_keypad
-	;call	display_clear
-	;movlw	0x1
-	;call	LCD_Write_Message
 	return
 
 key_control_noclr:	
-	movff	combined_input, LATD ;test
+	movff	combined_input, LATD 
 	movlw	0xff
 	cpfslt	combined_input, A	
 	goto	key_control_noclr

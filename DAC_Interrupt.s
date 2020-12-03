@@ -1,13 +1,13 @@
 #include <xc.inc>
 	
-global	DAC_Setup, DAC_Int_Hi
+global	T0_Setup, K_Int_Hi, timer3_setup
 extrn	get_key
 
    
     
 psect	dac_code, class=CODE
 	
-DAC_Int_Hi:	
+K_Int_Hi:	
 	btfss	TMR0IF		; check that this is timer0 interrupt
 	retfie	f		; if not then return
 	call	get_key
@@ -15,15 +15,18 @@ DAC_Int_Hi:
 	bcf	TMR0IF		; clear interrupt flag
 	retfie	f		; fast return from interrupt
 
-DAC_Setup:
+T0_Setup:
 	clrf	TRISJ, A	; Set PORTD as all outputs
 	clrf	LATJ, A		; Clear PORTD outputs
 	movlw	10000011B	; Set timer0 to 16-bit, Fosc/4/16
-	movwf	T0CON, A	; = 500KHz clock rate, approx 1sec rollover
+	movwf	T0CON, A	; 1MHz clock rate, approx 4ms rollover
 	bsf	TMR0IE		; Enable timer0 interrupt
 	bsf	GIE		; Enable all interrupts
 	return
-	
-	;end
+
+timer3_setup:
+	movlw	10100011B	; set timer 3 to 1MHz rate
+	movwf	T3CON, A
+	return
 
 
