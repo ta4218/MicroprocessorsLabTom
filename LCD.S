@@ -1,9 +1,9 @@
 #include <xc.inc>
 
-global  LCD_Setup, LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off, LCD_off
+global  LCD_Setup, LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off
 global	write_rn, rn_one, write_one, display_clear, LCD_delay_ms, delay_500ms, smiley
     
-extrn	key_control, counter_kp, on_off, setup
+extrn	key_control
     
 psect	udata_acs   ; named variables in access ram
 	
@@ -119,7 +119,7 @@ delay_500ms:
 	movwf	count_500ms, A	; a routine for 500ms delay
 d1slp:	movlw	250
 	call	LCD_delay_ms
-	decfsz	count_500ms
+	decfsz	count_500ms, A
 	bra	d1slp
 	return
 	
@@ -202,13 +202,3 @@ write_one:
 	call	LCD_Write_Message
 	return
 	
-LCD_off:
-	call	cursor_off	
-	call	display_clear
-	call	key_control	    ; see which key is pressed, standby or restart
-	movlw	0x3D
-	cpfseq	counter_kp
-	bra	LCD_off		    
-	call	display_clear	    ; enter standby
-	incf	on_off, A	    ; increment on_off variable
-	goto	setup

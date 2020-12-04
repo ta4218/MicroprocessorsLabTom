@@ -3,9 +3,7 @@
 global	T0_Setup, K_Int_Hi, timer3_setup
 extrn	get_key
 
-   
-    
-psect	dac_code, class=CODE
+psect	int_code, class=CODE
 	
 K_Int_Hi:	
 	btfss	TMR0IF		; check that this is timer0 interrupt

@@ -10,45 +10,38 @@ keypad_table:
 	db      0xED, 0xEB, 0xE7    ; table of combined values for rows/columns, will compare returned value to this table
 	align   2
 	
-psect	udata_acs   ; define all your local variables here (look at LCD.S), they will be put in access ram
-kp_delay_count: ds 1 ; one byte for counter variable in access ram 
-kp_delay_count2: ds 1
-counter_kp: ds 1    ; one byte for counter variable in access ram
-row_input:  ds 1
-col_input:  ds 1
-combined_input:	ds 1
-table_temp: ds 1
+psect	udata_acs	;store variables in access ram
+kp_delay_count: ds 1	;one byte for counter variable 
+kp_delay_count2: ds 1	;one byte for counter variable 
+counter_kp: ds 1	;one byte for keypad input 
+row_input:  ds 1	;one byte for row input 
+col_input:  ds 1	;one byte for column input
+combined_input:	ds 1	;one byte for combined row/colum sum 
+table_temp: ds 1	;one byte for temporary variable from table
     
-    
-	
-    
+       
 psect   udata_bank4	; more space in data memory in bank 4
 array_kp:	ds 0x12	; space for the karray table   
-	;counter_kp EQU      10    ; is this a supposed to be a variable or a constant?
-
-
 
 psect	keypad_code, class=CODE
 keypad_setup:
-	setf    TRISE, A    ;Set pullups on PORTE
-	banksel PADCFG1
-	bsf     REPU
-	movlb   0x00 
-	clrf	TRISH, A	;porth output to display keypad value
-	clrf	TRISD, A
-	clrf	LATD, A
+	setf    TRISE, A    ;PORTE input
+	banksel PADCFG1	    ;select bank register PADCFG1
+	bsf     REPU	    ;Set pullups on PORTE
+	movlb   0x00	    
+	clrf	TRISH, A    ;PORTH output to display keypad value
 	return
 
 get_key:
 	goto	read_rows
-	movlw	0xff
-	movwf	combined_input, A
+	movlw	0xff		
+	movwf	combined_input, A;assume combined_input 0xff unless changed
 read_rows:
 	clrf    LATE, A    ;Write 0s to LATE
 	movlw   0x0f
 	movwf   TRISE, A    ;Pins 0-3 input, Pins 4-7 output
     
-	movlw   0x2
+	movlw   0x2		;delay for voltage to settle
 	movwf   kp_delay_count, A
 	call    delay
     
@@ -60,83 +53,81 @@ read_cols:
 	movlw   0xf0
 	movwf   TRISE, A    ;Pins 0-3 output, Pins 4-7 input
     
-	movlw   0x2
+	movlw   0x2		;delay for voltage to settle
 	movwf   kp_delay_count, A
 	call    delay
    
-	movff   PORTE, col_input
+	movff   PORTE, col_input    
     
 decode:
 	movf    row_input, W, A
-	addwf   col_input, W, A	    ;Combine value of rows/columns
-	movwf   combined_input, A		    ;Move to RAM
+	addwf   col_input, W, A		;Combine value of rows/columns
+	movwf   combined_input, A	;Move to RAM
 	return
 	
 start_keypad:
-	lfsr	2, array_kp    ; Load FSR0 with address in RAM    
-	movlw   low highword(keypad_table)    ; address of data in PM
-	movwf   TBLPTRU, A        ; load upper bits to TBLPTRU
-	movlw   high(keypad_table)    ; address of data in PM
-	movwf   TBLPTRH, A        ; load high byte to TBLPTRH
-	movlw   low(keypad_table)    ; address of data in PM
-	movwf   TBLPTRL, A        ; load low byte to TBLPTRL
-	movlw   0        ; bytes to count up
-	movwf   counter_kp, A        ; our counter register
+	lfsr	2, array_kp		    ; Load FSR0 with address in RAM    
+	movlw   low highword(keypad_table)  ; address of data in PM
+	movwf   TBLPTRU, A		    ; load upper bits to TBLPTRU
+	movlw   high(keypad_table)	    ; address of data in PM
+	movwf   TBLPTRH, A		    ; load high byte to TBLPTRH
+	movlw   low(keypad_table)	    ; address of data in PM
+	movwf   TBLPTRL, A		    ; load low byte to TBLPTRL
+	movlw   0			    ; bytes to count up
+	movwf   counter_kp, A		    ; our counter register
 loop_kp:     
-	tblrd*+            ; one byte from PM to TABLAT, increment TBLPRT
-	movff   TABLAT, table_temp; move data from TABLAT to 0x23   
-        incfsz  counter_kp, A    ; count up   
+	tblrd*+				    ; one byte from PM to TABLAT, increment TBLPRT
+	movff   TABLAT, table_temp	    ; move data from TABLAT to temp location for comparison   
+        incfsz  counter_kp, A		    ; count up   
 	
-	movf    table_temp, W
-	cpfseq  combined_input, A	;compare pressed value with table
-	bra     loop_kp        ; keep going until finished
-	;movff   counter_kp, 	;move 'counter' value of keypad to 0x24
-	movlw	0x1
-	subwf	counter_kp
+	movf    table_temp, W, A
+	cpfseq  combined_input, A	    ;compare pressed value with table
+	bra     loop_kp			    ; keep going until finished
+	movlw	0x1			    ;subtract one for key input
+	subwf	counter_kp, A
 ascii:
-	movlw	0x30
-	lfsr    2, counter_kp
-	addwf	INDF2, 1, 0
+	movlw	0x30			    ; add 30h for ascii
+	lfsr    2, counter_kp		    
+	addwf	INDF2, F, A
+	movf	counter_kp, W, A	    
 	return
 
 key_control:	
-	movff	combined_input, LATD
 	movlw	0xff
-	cpfslt	combined_input, A	
+	cpfslt	combined_input, A	    ;compare input to see if key pressed
 	goto	key_control
-	call	start_keypad
+	call	start_keypad		    ;decode if key pressed
 	return
 
 key_control_noclr:	
-	movff	combined_input, LATD 
 	movlw	0xff
-	cpfslt	combined_input, A	
+	cpfslt	combined_input, A	    ;compare input to see if key pressed
 	goto	key_control_noclr
-	call	start_keypad
+	call	start_keypad		    ;decode if key pressed
 	movlw	0x1
-	call	LCD_Write_Message
+	call	LCD_Write_Message	    ;write to LCD immediately
 	return
 
 input_answer:
-	call	key_control_noclr
+	call	key_control_noclr	    ;wait for key press
 	
 	movlw	0x1
-	call	delay_500ms
+	call	delay_500ms		    ;500ms delay allows one key to be pressed
 	
-	movlw	0x3E
-	cpfseq	counter_kp
+	movlw	0x3E			    ;skip if enter pressed
+	cpfseq	counter_kp, A  
 	
-	bra	ia_lp
-	;call	test
-	return
+	bra	ia_lp			    
 	
-ia_lp:	movlw	0x30
-	subwf	counter_kp
-	movff	counter_kp, POSTINC1
+	return				;return if enter pressed
+	
+ia_lp:	movlw	0x30			
+	subwf	counter_kp, A		;remove ascii conversion
+	movff	counter_kp, POSTINC1	  ; move to input_answer
 	bra	input_answer
 	
-delay:        
-	decfsz  kp_delay_count, f, A
+delay:  
+	decfsz  kp_delay_count, F, A
 	movlw   0x10
 	movwf	kp_delay_count2, A
 	call    cascade
@@ -144,8 +135,8 @@ delay:
 	bra	delay
 	return
     
-cascade:  ;190ns delay
-	decfsz  kp_delay_count2, f, A
+cascade:  ;1.25us delay
+	decfsz  kp_delay_count2, F, A
 	bra	cascade
 	return
 	

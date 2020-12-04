@@ -1,7 +1,7 @@
 #include <xc.inc>
     
 extrn	LCD_Write_Message, second_line, LCD_Send_Byte_I, cursor_off 
-extrn	display_clear, delay_500ms,key_control, counter_kp
+extrn	display_clear, delay_500ms,key_control
 
 global	play_again
     

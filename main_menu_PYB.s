@@ -109,14 +109,14 @@ result_LCD:
 	movlw	0xB
 	movwf	rltlp_count, A		; set how many letters we want moved, here its 11 for 'you scored '
 	
-rltlp:	movf	result_index, W
+rltlp:	movf	result_index, W, A
 	movff	PLUSW2, result_print	; moves the start address of 'YOU SCORED ' to result_print
 	lfsr	2, result_print
 	movlw	0x1			; writes first letter of statement to LCD
 	call	LCD_Write_Message
 	lfsr	2, myArray		; reset FSR2
-	incf	result_index		; increment the position we want into myArray
-	decfsz	rltlp_count		; decrement the counter of number of letters we want moved, skip next instruction if 0
+	incf	result_index, A		; increment the position we want into myArray
+	decfsz	rltlp_count, A		; decrement the counter of number of letters we want moved, skip next instruction if 0
 	bra	rltlp			; branch back for next letter
 	
 	movlw	0x30

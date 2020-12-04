@@ -18,7 +18,7 @@ psect    RNG_code, class=CODE
 setupRNG:    
     bcf    CFGS		    ;point to Flash program memory
     bsf    EEPGD	    ;access Flash program memory
-    movf   TMR3L, W	    ;set TIMER3 as seed
+    movf   TMR3L, W,A	    ;set TIMER3 as seed
     goto   startRNG
     
 myTableRNG:
@@ -27,47 +27,47 @@ myTableRNG:
     
 startRNG:
     lfsr    0, myArrayRNG   ;load FSR0 with adress in RAM
-    movwf  RANDOM	    ;Assign seed to RANDOM
+    movwf  RANDOM,A	    ;Assign seed to RANDOM
     movlw  10        
     movwf  counterRNG, A    ; set counter variable to 10
     
 loopRNG:
     call   shiftRNG
     call   outputRNG
-    movf    RANDOM, W
-    tstfsz  counterRNG
+    movf    RANDOM, W,A
+    tstfsz  counterRNG,A
     bra    loopRNG
     lfsr    0, myArrayRNG   ;load FSR0 with adress in RAM
     call    h2d_rng
     return
     
 shiftRNG:
-    RLCF    RANDOM, W	    ;moves MSB to carry, shifts numbers left
-    RLCF    RANDOM, W	    ;moves all numbers left, carry initialised already
-    BTFSC   RANDOM, 4	    ;if bit 4 is 0 then next instruction skipped
-    XORLW   1		    ;contents of W are XORed with 1
-    BTFSC   RANDOM, 5       ;if bit 5 is 0 then next instruction skipped
-    XORLW   1		    ;contents of W are XORed with 1
-    BTFSC   RANDOM, 3       ;if bit 3 is 0 then next instruction skipped
-    XORLW   1		    ;contents of W are XORed with 1
-    MOVWF   RANDOM          ; load W into RANDOM variable
+    rlcf    RANDOM, W,A	    ;moves MSB to carry, shifts numbers left
+    rlcf    RANDOM, W,A	    ;moves all numbers left, carry initialised already
+    btfsc   RANDOM, 4,A	    ;if bit 4 is 0 then next instruction skipped
+    xorlw   1		    ;contents of W are XORed with 1
+    btfsc   RANDOM, 5,A       ;if bit 5 is 0 then next instruction skipped
+    xorlw   1		    ;contents of W are XORed with 1
+    btfsc   RANDOM, 3,A       ;if bit 3 is 0 then next instruction skipped
+    xorlw   1		    ;contents of W are XORed with 1
+    movwf   RANDOM,A          ; load W into RANDOM variable
     return
     
 outputRNG:
-    bcf	    RANDOM, 7       ;Clear MSB to ensure no higher than 127
+    bcf	    RANDOM, 7 ,A      ;Clear MSB to ensure no higher than 127
     movlw   0x63            
-    cpfsgt  RANDOM          ;if greater than 99, skip call save
+    cpfsgt  RANDOM,A          ;if greater than 99, skip call save
     call    checkdouble	    ;go to second check
     return
     
 checkdouble:
     movlw   0xA		    ;compare number to 10, so that its not less than 10
-    cpfslt  RANDOM
+    cpfslt  RANDOM,A
     call    saveRNG
     return
     
 saveRNG:    
-    movf    RANDOM, W	    ;move RANDOM into W register
+    movf    RANDOM, W,A	    ;move RANDOM into W register
     movwf   POSTINC0, A     ;load LFSR0 with W and increment LFSR
     decfsz  counterRNG, A   ;decrement counter to count down from 10
     return
@@ -82,8 +82,8 @@ multiplyRNG1:
 
 multiplyRNG2:
     movff   PLUSW2, vari2   ;moves number at FSR2, which has been indexed, to vari2
-    movf    vari2, W
-    mulwf   vari	    ;multiplies vari and vari2 to find correct answer
+    movf    vari2, W,A
+    mulwf   vari,A	    ;multiplies vari and vari2 to find correct answer
     return
     
 
@@ -94,7 +94,7 @@ addRNG1:
 
 addRNG2:
     movff   PLUSW2, vari2   ;moves number at FSR2, which has been indexed, to vari2
-    movf    vari2, W
+    movf    vari2, W,A
     addwf   vari, W, A	    ;adds vari and vari2 to find correct answer
     return
     
