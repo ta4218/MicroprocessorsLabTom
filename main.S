@@ -5,7 +5,7 @@ extrn	LCD_Setup, delay_500ms
 extrn	keypad_setup,  start_logo, game_select, key_control, display_clear, cursor_off
 extrn	T0_Setup, K_Int_Hi
 extrn	setupRNG, game_setup
-extrn   result_LCD, play_again, timer3_setup;,  LCD_off
+extrn   result_LCD, play_again, timer3_setup
 
 psect	udata_acs
 on_off:	    ds  1   ;reserve one byte for on/off counter
@@ -30,8 +30,6 @@ setup:
 	
 	call	LCD_Setup	; setup LCD
 	call	keypad_setup	; SETUP KEYPAD
-	;movlw	0x1
-	;cpfsgt	on_off		; is on_off greater than 1, if so skip next
 	call	T0_Setup	; interrupt setup 
 	movlw	0x1
 	cpfsgt	on_off, A	; is on_off greater than 1, if so skip next
