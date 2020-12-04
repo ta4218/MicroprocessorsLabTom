@@ -16,7 +16,7 @@ K_Int_Hi:
 T0_Setup:
 	clrf	TRISJ, A	; Set PORTD as all outputs
 	clrf	LATJ, A		; Clear PORTD outputs
-	movlw	10000011B	; Set timer0 to 16-bit, Fosc/4/16
+	movlw	10000000B	; Set timer0 to 16-bit, Fosc/4/2
 	movwf	T0CON, A	; 1MHz clock rate, approx 4ms rollover
 	bsf	TMR0IE		; Enable timer0 interrupt
 	bsf	GIE		; Enable all interrupts
