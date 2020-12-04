@@ -15,13 +15,13 @@
       <itemPath>main.S</itemPath>
       <itemPath>config.S</itemPath>
       <itemPath>LCD.S</itemPath>
-      <itemPath>DAC_Interrupt.s</itemPath>
       <itemPath>keypad_project.s</itemPath>
-      <itemPath>main_menu_PYB.s</itemPath>
       <itemPath>Random_Number_Generator.s</itemPath>
       <itemPath>Hex2Dec.s</itemPath>
-      <itemPath>play_again2.s</itemPath>
       <itemPath>game.s</itemPath>
+      <itemPath>Interrupt.s</itemPath>
+      <itemPath>main_menu.s</itemPath>
+      <itemPath>play_again.s</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
