@@ -1,3 +1,4 @@
+#include <pic18_chip_select.inc>
 #include <xc.inc>
 
 extrn	LCD_Setup, delay_500ms
